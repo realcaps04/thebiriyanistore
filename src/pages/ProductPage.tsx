@@ -8,7 +8,7 @@ import {
   Star,
   TrendingUp,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type TouchEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { addCartItem } from '../config/cart'
 import {
@@ -29,6 +29,42 @@ function toggleGroupSelection(
   }
   if (selected.length >= group.max) return selected
   return [...selected, addonId]
+}
+
+function addonCardTapHandlers(onTap: () => void, disabled: boolean) {
+  let startX = 0
+  let startY = 0
+  let moved = false
+  let touchHandled = false
+
+  return {
+    onTouchStart(event: TouchEvent) {
+      if (disabled) return
+      touchHandled = false
+      startX = event.touches[0].clientX
+      startY = event.touches[0].clientY
+      moved = false
+    },
+    onTouchMove(event: TouchEvent) {
+      if (disabled) return
+      const dx = Math.abs(event.touches[0].clientX - startX)
+      const dy = Math.abs(event.touches[0].clientY - startY)
+      if (dx > 8 || dy > 8) moved = true
+    },
+    onTouchEnd() {
+      if (disabled || moved) return
+      touchHandled = true
+      onTap()
+    },
+    onClick() {
+      if (touchHandled) {
+        touchHandled = false
+        return
+      }
+      if (disabled || moved) return
+      onTap()
+    },
+  }
 }
 
 export function ProductPage() {
@@ -148,9 +184,12 @@ export function ProductPage() {
 
           {addonGroups.map((group) => {
             const selected = groupSelections[group.id] ?? []
-            const isDrinkGroup = group.id === 'drinks'
+            const useTileGrid = group.id === 'donne-extras'
             return (
-              <section key={group.id} className="product-section">
+              <section
+                key={group.id}
+                className={`product-section product-section--addon-cards ${useTileGrid ? 'product-section--addon-tiles' : ''}`}
+              >
                 <div className="product-addon-group__head">
                   <h2 className="product-section__title product-section__title--inline">
                     {group.title}
@@ -159,62 +198,54 @@ export function ProductPage() {
                     {selected.length}/{group.max}
                   </span>
                 </div>
-                {isDrinkGroup ? (
-                  <div className="product-addon-card-grid scrollbar-hide">
-                    {group.items.map((addon) => {
-                      const active = selected.includes(addon.id)
-                      const disabled = !active && selected.length >= group.max
-                      return (
-                        <button
-                          key={addon.id}
-                          type="button"
-                          className={`product-addon-card ${active ? 'product-addon-card--active' : ''} ${disabled ? 'product-addon-card--disabled' : ''}`}
-                          onClick={() => handleGroupToggle(group, addon.id)}
-                          disabled={disabled}
-                        >
-                          <div className="product-addon-card__image-wrap">
-                            {addon.image && (
-                              <img src={addon.image} alt="" className="product-addon-card__image" />
-                            )}
-                            <span
-                              className={`product-addon-card__check ${active ? 'product-addon-card__check--active' : ''}`}
-                              aria-hidden
-                            >
-                              {active && <Check size={11} strokeWidth={3} />}
+                <div
+                  className={`product-addon-card-grid scrollbar-hide ${useTileGrid ? 'product-addon-card-grid--tiles' : ''}`}
+                >
+                  {group.items.map((addon) => {
+                    const active = selected.includes(addon.id)
+                    const disabled = !active && selected.length >= group.max
+                    const tapHandlers = addonCardTapHandlers(
+                      () => handleGroupToggle(group, addon.id),
+                      disabled,
+                    )
+                    return (
+                      <div
+                        key={addon.id}
+                        role="checkbox"
+                        aria-checked={active}
+                        aria-disabled={disabled}
+                        tabIndex={disabled ? -1 : 0}
+                        className={`product-addon-card ${active ? 'product-addon-card--active' : ''} ${disabled ? 'product-addon-card--disabled' : ''}`}
+                        onKeyDown={(event) => {
+                          if (disabled) return
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            handleGroupToggle(group, addon.id)
+                          }
+                        }}
+                        {...tapHandlers}
+                      >
+                        <div className="product-addon-card__image-wrap">
+                          {addon.image ? (
+                            <img src={addon.image} alt="" className="product-addon-card__image" />
+                          ) : (
+                            <span className="product-addon-card__placeholder" aria-hidden>
+                              +
                             </span>
-                          </div>
-                          <span className="product-addon-card__name">{addon.name}</span>
-                          <span className="product-addon-card__price">₹{addon.price.toFixed(2)}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <div className="product-addon-list">
-                    {group.items.map((addon) => {
-                      const active = selected.includes(addon.id)
-                      const disabled = !active && selected.length >= group.max
-                      return (
-                        <button
-                          key={addon.id}
-                          type="button"
-                          className={`product-addon-row ${active ? 'product-addon-row--active' : ''} ${disabled ? 'product-addon-row--disabled' : ''}`}
-                          onClick={() => handleGroupToggle(group, addon.id)}
-                          disabled={disabled}
-                        >
+                          )}
                           <span
-                            className={`product-addon-row__check ${active ? 'product-addon-row__check--active' : ''}`}
+                            className={`product-addon-card__check ${active ? 'product-addon-card__check--active' : ''}`}
                             aria-hidden
                           >
-                            {active && <Check size={12} strokeWidth={3} />}
+                            {active && <Check size={11} strokeWidth={3} />}
                           </span>
-                          <span className="product-addon-row__name">{addon.name}</span>
-                          <span className="product-addon-row__price">₹{addon.price.toFixed(2)}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
+                        </div>
+                        <span className="product-addon-card__name">{addon.name}</span>
+                        <span className="product-addon-card__price">₹{addon.price.toFixed(2)}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </section>
             )
           })}

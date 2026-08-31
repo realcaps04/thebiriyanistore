@@ -74,10 +74,16 @@ const donneExtrasGroup: ProductAddonGroup = {
   title: 'Donne Extras',
   max: 4,
   items: [
-    { id: 'extra-salad', name: 'I Need More Salad', price: 20 },
-    { id: 'extra-gravy', name: 'I Need More Gravy', price: 20 },
-    { id: 'extra-boiled-egg', name: 'I Need Extra Boiled Egg', price: 20, menuItemId: 'egg-boiled' },
-    { id: 'extra-dates-pickle', name: 'I Need Dates Pickle', price: 20 },
+    { id: 'extra-salad', name: 'I Need More Salad', price: 20, image: '/brand/food-sides.jpg' },
+    { id: 'extra-gravy', name: 'I Need More Gravy', price: 20, image: '/brand/food-biryani.jpg' },
+    {
+      id: 'extra-boiled-egg',
+      name: 'I Need Extra Boiled Egg',
+      price: 20,
+      menuItemId: 'egg-boiled',
+      image: '/egg/egg-boiled.jpg',
+    },
+    { id: 'extra-dates-pickle', name: 'I Need Dates Pickle', price: 20, image: '/categories/egg.jpg' },
   ],
 }
 
