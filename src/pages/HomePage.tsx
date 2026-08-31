@@ -26,22 +26,19 @@ export function HomePage() {
       <main className="device home-page">
         {/* Header */}
         <header className="home-header">
-          <div className="flex items-center gap-3 min-w-0">
+          <button type="button" className="icon-btn home-header__notify" aria-label="Notifications">
+            <Bell size={20} />
+          </button>
+          <div className="home-header__brand">
             <div className="store-logo">
               <img src="/brand/logo.png" alt="" className="w-full h-full object-contain p-1" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-base font-bold text-ink leading-tight truncate">{store.name}</h1>
-              <button className="flex items-center gap-1 text-[11.2px] text-muted mt-0.5 max-w-full">
-                <MapPin size={12} className="shrink-0 text-brand" />
-                <span className="truncate">{store.locationDetail}</span>
-                <ChevronRight size={12} className="shrink-0 rotate-90" />
-              </button>
-            </div>
+            <h1 className="home-header__title">{store.name}</h1>
+            <button type="button" className="home-header__location">
+              <MapPin size={12} className="shrink-0 text-brand" />
+              <span>{store.locationDetail}</span>
+            </button>
           </div>
-          <button type="button" className="icon-btn" aria-label="Notifications">
-            <Bell size={20} />
-          </button>
         </header>
 
         {/* Search */}

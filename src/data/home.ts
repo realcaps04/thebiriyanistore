@@ -1,8 +1,8 @@
 export const store = {
   name: 'The Biriyani Store',
   slug: 'thebiriyanistore',
-  location: 'Edappally, Kochi',
-  locationDetail: 'MG Road, Near Lulu Mall',
+  location: 'Kaloor, Kochi',
+  locationDetail: 'Vylopilly Lane, Kaloor, Kochi, India 682017',
 }
 
 export const activeOrders = [
