@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState, type TouchEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { addCartItem } from '../config/cart'
+import { useCartSync } from '../hooks/useCartSync'
 import {
   getMenuItemById,
   getProductAddonGroups,
@@ -70,6 +70,7 @@ function addonCardTapHandlers(onTap: () => void, disabled: boolean) {
 export function ProductPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { addItem } = useCartSync()
   const item = id ? getMenuItemById(id) : undefined
 
   const addonGroups = useMemo(() => (item ? getProductAddonGroups(item) : []), [item])
@@ -105,8 +106,8 @@ export function ProductPage() {
     }))
   }
 
-  const handleAddToCart = () => {
-    addCartItem({
+  const handleAddToCart = async () => {
+    await addItem({
       menuItemId: item.id,
       name: item.name,
       image: item.image,

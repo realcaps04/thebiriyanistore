@@ -40,6 +40,10 @@ export function isLoggedIn() {
   return Boolean(localStorage.getItem(AUTH_STORAGE_KEY))
 }
 
+export function getAuthToken(): string | null {
+  return localStorage.getItem(AUTH_STORAGE_KEY)
+}
+
 export function clearAuth() {
   localStorage.removeItem(AUTH_STORAGE_KEY)
   localStorage.removeItem(USER_STORAGE_KEY)

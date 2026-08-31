@@ -38,6 +38,9 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff2}'],
         cleanupOutdatedCaches: true,
+        navigateFallback: '/index.html',
+        // Match SPA routes including query strings (e.g. /home?_mvua=1 from Vite dev).
+        navigateFallbackAllowlist: [/^\/[^.]*$/],
       },
       devOptions: {
         enabled: true,

@@ -9,6 +9,10 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as cart from "../cart.js";
+import type * as orders from "../orders.js";
+import type * as session from "../session.js";
+import type * as validators from "../validators.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +22,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  cart: typeof cart;
+  orders: typeof orders;
+  session: typeof session;
+  validators: typeof validators;
 }>;
 
 /**

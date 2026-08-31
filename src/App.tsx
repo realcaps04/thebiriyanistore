@@ -2,19 +2,35 @@ import { useAction } from 'convex/react'
 import { useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { api } from '../convex/_generated/api'
-import { isLoggedIn, saveAuthSession } from './config/auth'
+import { saveAuthSession } from './config/auth'
+import { useAuthSession } from './hooks/useAuthSession'
 import { CartPage } from './pages/CartPage'
 import { HomePage } from './pages/HomePage'
 import { ProductPage } from './pages/ProductPage'
 import { SplashPage } from './pages/SplashPage'
 
+function AuthLoading() {
+  return (
+    <div className="shell">
+      <main className="device flex items-center justify-center min-h-dvh">
+        <p className="text-sm text-muted">Loading…</p>
+      </main>
+    </div>
+  )
+}
+
 function WelcomeRoute() {
   const navigate = useNavigate()
   const signIn = useAction(api.auth.signInWithGoogleAccessToken)
+  const { isAuthenticated, isLoading } = useAuthSession()
   const [loginError, setLoginError] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
 
-  if (isLoggedIn()) {
+  if (isLoading) {
+    return <AuthLoading />
+  }
+
+  if (isAuthenticated) {
     return <Navigate to="/home" replace />
   }
 
@@ -62,7 +78,13 @@ function WelcomeRoute() {
 }
 
 function HomeRoute() {
-  if (!isLoggedIn()) {
+  const { isAuthenticated, isLoading } = useAuthSession()
+
+  if (isLoading) {
+    return <AuthLoading />
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />
   }
 
@@ -70,7 +92,13 @@ function HomeRoute() {
 }
 
 function ProductRoute() {
-  if (!isLoggedIn()) {
+  const { isAuthenticated, isLoading } = useAuthSession()
+
+  if (isLoading) {
+    return <AuthLoading />
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />
   }
 
@@ -78,7 +106,13 @@ function ProductRoute() {
 }
 
 function CartRoute() {
-  if (!isLoggedIn()) {
+  const { isAuthenticated, isLoading } = useAuthSession()
+
+  if (isLoading) {
+    return <AuthLoading />
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />
   }
 

@@ -12,8 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getCartSummary } from '../config/cart'
-import { getActiveOrders, type ActiveOrder } from '../config/orders'
+import { useCartSync, useOrdersSync } from '../hooks/useCartSync'
 import { bestSellers, biryanis, categories as categoryData, drinks, egg, products, store } from '../data/home'
 
 export function HomePage() {
@@ -22,21 +21,8 @@ export function HomePage() {
   const [activeCategory, setActiveCategory] = useState('biryanis')
   const [mapOpen, setMapOpen] = useState(false)
   const [comboComingSoonOpen, setComboComingSoonOpen] = useState(false)
-  const [orders, setOrders] = useState<ActiveOrder[]>([])
-  const [cartCount, setCartCount] = useState(0)
-  const [cartTotal, setCartTotal] = useState(0)
-
-  useEffect(() => {
-    setOrders(getActiveOrders())
-    const refreshCart = () => {
-      const summary = getCartSummary()
-      setCartCount(summary.count)
-      setCartTotal(summary.total)
-    }
-    refreshCart()
-    window.addEventListener('cart-updated', refreshCart)
-    return () => window.removeEventListener('cart-updated', refreshCart)
-  }, [])
+  const { count: cartCount, total: cartTotal } = useCartSync()
+  const orders = useOrdersSync() ?? []
 
   const [bestSellerIndex, setBestSellerIndex] = useState(0)
 
@@ -105,8 +91,18 @@ export function HomePage() {
             <Search size={18} className="text-muted shrink-0" />
             <input type="search" placeholder="What are you looking for?" />
           </div>
-          <button type="button" className="cart-btn" aria-label="Cart" onClick={openCart}>
+          <button
+            type="button"
+            className="cart-btn"
+            aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : 'Cart'}
+            onClick={openCart}
+          >
             <ShoppingCart size={18} />
+            {cartCount > 0 && (
+              <span className="cart-btn__badge" aria-hidden>
+                {cartCount > 99 ? '99+' : cartCount}
+              </span>
+            )}
           </button>
         </div>
 
@@ -207,13 +203,7 @@ export function HomePage() {
 
           {/* Categories */}
           <section className="categories-section mt-6">
-            <div className="section-header">
-              <h2 className="section-title section-title--inline">Search By Categories</h2>
-              <button type="button" className="section-view-all">
-                View all
-                <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
-              </button>
-            </div>
+            <h2 className="section-title">Search By Categories</h2>
             <div className="categories-row scrollbar-hide">
               {categoryData.map((cat) => {
                 const isActive = activeCategory === cat.id
