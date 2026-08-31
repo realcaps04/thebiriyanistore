@@ -16,6 +16,10 @@ const items = [
     url: 'https://b.zmtcdn.com/data/dish_photos/3b3/f9b5a1e0ae2f4bab5e316a8cb53d63b3.png',
   },
   {
+    file: 'mint-lime.png',
+    url: 'https://b.zmtcdn.com/data/dish_photos/3b3/f9b5a1e0ae2f4bab5e316a8cb53d63b3.png',
+  },
+  {
     file: 'mirinda-330ml.png',
     url: 'https://b.zmtcdn.com/data/dish_photos/f87/0141846153aa57d6883fc6e6bb896f87.png',
   },

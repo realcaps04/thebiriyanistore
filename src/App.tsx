@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { api } from '../convex/_generated/api'
 import { isLoggedIn, saveAuthSession } from './config/auth'
+import { CartPage } from './pages/CartPage'
 import { HomePage } from './pages/HomePage'
 import { ProductPage } from './pages/ProductPage'
 import { SplashPage } from './pages/SplashPage'
@@ -76,11 +77,20 @@ function ProductRoute() {
   return <ProductPage />
 }
 
+function CartRoute() {
+  if (!isLoggedIn()) {
+    return <Navigate to="/" replace />
+  }
+
+  return <CartPage />
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<WelcomeRoute />} />
       <Route path="/home" element={<HomeRoute />} />
+      <Route path="/cart" element={<CartRoute />} />
       <Route path="/product/:id" element={<ProductRoute />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

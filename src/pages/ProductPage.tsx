@@ -117,7 +117,7 @@ export function ProductPage() {
       specialInstructions: specialInstructions.trim(),
       quantity: 1,
     })
-    navigate('/home')
+    navigate('/cart')
   }
 
   const summaryParts = [
@@ -184,11 +184,11 @@ export function ProductPage() {
 
           {addonGroups.map((group) => {
             const selected = groupSelections[group.id] ?? []
-            const useTileGrid = group.id === 'donne-extras'
+            const useRows = group.id === 'donne-extras'
             return (
               <section
                 key={group.id}
-                className={`product-section product-section--addon-cards ${useTileGrid ? 'product-section--addon-tiles' : ''}`}
+                className={`product-section ${useRows ? '' : 'product-section--addon-cards'}`}
               >
                 <div className="product-addon-group__head">
                   <h2 className="product-section__title product-section__title--inline">
@@ -198,54 +198,76 @@ export function ProductPage() {
                     {selected.length}/{group.max}
                   </span>
                 </div>
-                <div
-                  className={`product-addon-card-grid scrollbar-hide ${useTileGrid ? 'product-addon-card-grid--tiles' : ''}`}
-                >
-                  {group.items.map((addon) => {
-                    const active = selected.includes(addon.id)
-                    const disabled = !active && selected.length >= group.max
-                    const tapHandlers = addonCardTapHandlers(
-                      () => handleGroupToggle(group, addon.id),
-                      disabled,
-                    )
-                    return (
-                      <div
-                        key={addon.id}
-                        role="checkbox"
-                        aria-checked={active}
-                        aria-disabled={disabled}
-                        tabIndex={disabled ? -1 : 0}
-                        className={`product-addon-card ${active ? 'product-addon-card--active' : ''} ${disabled ? 'product-addon-card--disabled' : ''}`}
-                        onKeyDown={(event) => {
-                          if (disabled) return
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault()
-                            handleGroupToggle(group, addon.id)
-                          }
-                        }}
-                        {...tapHandlers}
-                      >
-                        <div className="product-addon-card__image-wrap">
-                          {addon.image ? (
-                            <img src={addon.image} alt="" className="product-addon-card__image" />
-                          ) : (
-                            <span className="product-addon-card__placeholder" aria-hidden>
-                              +
-                            </span>
-                          )}
+                {useRows ? (
+                  <div className="product-addon-list">
+                    {group.items.map((addon) => {
+                      const active = selected.includes(addon.id)
+                      const disabled = !active && selected.length >= group.max
+                      return (
+                        <button
+                          key={addon.id}
+                          type="button"
+                          className={`product-addon-row ${active ? 'product-addon-row--active' : ''} ${disabled ? 'product-addon-row--disabled' : ''}`}
+                          onClick={() => handleGroupToggle(group, addon.id)}
+                          disabled={disabled}
+                        >
                           <span
-                            className={`product-addon-card__check ${active ? 'product-addon-card__check--active' : ''}`}
+                            className={`product-addon-row__check ${active ? 'product-addon-row__check--active' : ''}`}
                             aria-hidden
                           >
-                            {active && <Check size={11} strokeWidth={3} />}
+                            {active && <Check size={12} strokeWidth={3} />}
                           </span>
+                          <span className="product-addon-row__name">{addon.name}</span>
+                          <span className="product-addon-row__price">₹{addon.price.toFixed(2)}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="product-addon-card-grid scrollbar-hide">
+                    {group.items.map((addon) => {
+                      const active = selected.includes(addon.id)
+                      const disabled = !active && selected.length >= group.max
+                      const hasImage = Boolean(addon.image)
+                      const tapHandlers = addonCardTapHandlers(
+                        () => handleGroupToggle(group, addon.id),
+                        disabled,
+                      )
+                      return (
+                        <div
+                          key={addon.id}
+                          role="checkbox"
+                          aria-checked={active}
+                          aria-disabled={disabled}
+                          tabIndex={disabled ? -1 : 0}
+                          className={`product-addon-card ${active ? 'product-addon-card--active' : ''} ${disabled ? 'product-addon-card--disabled' : ''}`}
+                          onKeyDown={(event) => {
+                            if (disabled) return
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              handleGroupToggle(group, addon.id)
+                            }
+                          }}
+                          {...tapHandlers}
+                        >
+                          {hasImage && (
+                            <div className="product-addon-card__image-wrap">
+                              <img src={addon.image} alt="" className="product-addon-card__image" />
+                              <span
+                                className={`product-addon-card__check ${active ? 'product-addon-card__check--active' : ''}`}
+                                aria-hidden
+                              >
+                                {active && <Check size={11} strokeWidth={3} />}
+                              </span>
+                            </div>
+                          )}
+                          <span className="product-addon-card__name">{addon.name}</span>
+                          <span className="product-addon-card__price">₹{addon.price.toFixed(2)}</span>
                         </div>
-                        <span className="product-addon-card__name">{addon.name}</span>
-                        <span className="product-addon-card__price">₹{addon.price.toFixed(2)}</span>
-                      </div>
-                    )
-                  })}
-                </div>
+                      )
+                    })}
+                  </div>
+                )}
               </section>
             )
           })}
@@ -264,16 +286,16 @@ export function ProductPage() {
           </section>
         </div>
 
-        <div className="product-cart-bar">
+        <button type="button" className="product-cart-bar" onClick={handleAddToCart}>
           <div className="product-cart-bar__text">
             <p className="product-cart-bar__count">01 Item selected</p>
             <p className="product-cart-bar__summary">{summaryParts.join(', ')}</p>
           </div>
-          <button type="button" className="product-cart-bar__cta" onClick={handleAddToCart}>
+          <span className="product-cart-bar__cta">
             <span>₹{total.toFixed(2)}</span>
             <ChevronRight size={18} aria-hidden />
-          </button>
-        </div>
+          </span>
+        </button>
       </main>
     </div>
   )

@@ -74,16 +74,15 @@ const donneExtrasGroup: ProductAddonGroup = {
   title: 'Donne Extras',
   max: 4,
   items: [
-    { id: 'extra-salad', name: 'I Need More Salad', price: 20, image: '/brand/food-sides.jpg' },
-    { id: 'extra-gravy', name: 'I Need More Gravy', price: 20, image: '/brand/food-biryani.jpg' },
+    { id: 'extra-salad', name: 'I Need More Salad', price: 20 },
+    { id: 'extra-gravy', name: 'I Need More Gravy', price: 20 },
     {
       id: 'extra-boiled-egg',
       name: 'I Need Extra Boiled Egg',
       price: 20,
       menuItemId: 'egg-boiled',
-      image: '/egg/egg-boiled.jpg',
     },
-    { id: 'extra-dates-pickle', name: 'I Need Dates Pickle', price: 20, image: '/categories/egg.jpg' },
+    { id: 'extra-dates-pickle', name: 'I Need Dates Pickle', price: 20 },
   ],
 }
 
@@ -97,9 +96,28 @@ const chickenFryGroup: ProductAddonGroup = {
       name: 'Chicken Fry - Small',
       price: 152.38,
       menuItemId: 'bs-chicken-fry',
-      image: '/bestsellers/chicken-fry.jpg',
     },
   ],
+}
+
+function resolveAddonImage(item: AddonGroupItem): string | undefined {
+  if (!item.menuItemId) return undefined
+  const menuItem = getMenuItemById(item.menuItemId)
+  return menuItem?.image || undefined
+}
+
+function withResolvedImages(group: ProductAddonGroup): ProductAddonGroup {
+  return {
+    ...group,
+    items: group.items.map((item) => {
+      const image = resolveAddonImage(item)
+      if (!image) {
+        const { image: _unused, ...rest } = item
+        return rest
+      }
+      return { ...item, image }
+    }),
+  }
 }
 
 function buildDrinkGroup(): ProductAddonGroup {
@@ -108,7 +126,6 @@ function buildDrinkGroup(): ProductAddonGroup {
     name: drink.name,
     price: drink.price,
     menuItemId: drink.id,
-    image: drink.image,
   }))
 
   return {
@@ -128,15 +145,15 @@ export function getProductAddonGroups(item: MenuItem): ProductAddonGroup[] {
     item.name.toLowerCase().includes('donne')
 
   if (isBiryani && item.customizable) {
-    groups.push(donneExtrasGroup)
+    groups.push(withResolvedImages(donneExtrasGroup))
   }
 
   if (item.id !== 'bs-chicken-fry') {
-    groups.push(chickenFryGroup)
+    groups.push(withResolvedImages(chickenFryGroup))
   }
 
   if (item.categoryId !== 'drinks') {
-    groups.push(buildDrinkGroup())
+    groups.push(withResolvedImages(buildDrinkGroup()))
   }
 
   return groups

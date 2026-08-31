@@ -207,7 +207,7 @@ export const drinks: MenuItem[] = [
     name: 'Mint Lime Juice',
     desc: 'Refreshing mint and lime juice',
     price: 59,
-    image: '/drinks/fresh-lime.png',
+    image: '/drinks/mint-lime.png',
     customizable: false,
     categoryId: 'drinks',
   },

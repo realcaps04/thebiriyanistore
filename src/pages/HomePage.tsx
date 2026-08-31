@@ -63,6 +63,10 @@ export function HomePage() {
       ...products.filter((item) => item.categoryId === activeCategory),
     ]
 
+  const openCart = () => {
+    if (cartCount > 0) navigate('/cart')
+  }
+
   return (
     <div className="shell">
       <main className="device home-page">
@@ -101,7 +105,7 @@ export function HomePage() {
             <Search size={18} className="text-muted shrink-0" />
             <input type="search" placeholder="What are you looking for?" />
           </div>
-          <button type="button" className="cart-btn" aria-label="Cart">
+          <button type="button" className="cart-btn" aria-label="Cart" onClick={openCart}>
             <ShoppingCart size={18} />
           </button>
         </div>
@@ -263,7 +267,7 @@ export function HomePage() {
 
         {/* Cart bar */}
         {cartCount > 0 && (
-          <div className="cart-bar">
+          <button type="button" className="cart-bar" onClick={openCart}>
             <span className="text-sm font-medium">
               {String(cartCount).padStart(2, '0')} Items selected
             </span>
@@ -271,7 +275,7 @@ export function HomePage() {
               <span className="text-sm font-bold">₹{cartTotal.toFixed(2)}</span>
               <ChevronRight size={18} />
             </div>
-          </div>
+          </button>
         )}
 
         {/* Bottom nav — floating pill */}

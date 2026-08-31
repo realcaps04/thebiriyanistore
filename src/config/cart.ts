@@ -55,6 +55,10 @@ export function addCartItem(item: Omit<CartLineItem, 'id'>) {
   saveCartItems([...items, { ...item, id: crypto.randomUUID() }])
 }
 
+export function removeCartItem(id: string) {
+  saveCartItems(getCartItems().filter((item) => item.id !== id))
+}
+
 export function clearCart() {
   saveCartItems([])
 }
