@@ -20,7 +20,7 @@ export const bestSellers = [
     name: 'Chicken Dum Biryani Malabar Special',
     desc: 'Kaima rice dum biryani with tender chicken.',
     price: 219.05,
-    image: '/categories/biryanis.png',
+    image: '/bestsellers/chicken-malabar.png',
     customizable: true,
   },
   {
@@ -28,7 +28,7 @@ export const bestSellers = [
     name: 'Beef Dum Biryani Malabar Special',
     desc: 'Kaima rice dum biryani with succulent beef.',
     price: 219.05,
-    image: '/categories/biryanis.png',
+    image: '/bestsellers/beef-malabar.png',
     customizable: true,
   },
   {
@@ -36,7 +36,7 @@ export const bestSellers = [
     name: 'Chicken Fry Bangalore Special',
     desc: 'Bangalore style chicken fry.',
     price: 152.38,
-    image: '/categories/fry.jpg',
+    image: '/bestsellers/chicken-fry.png',
     customizable: true,
   },
   {
@@ -44,7 +44,7 @@ export const bestSellers = [
     name: 'Donne Biryani - Chicken',
     desc: 'Seeraga samba donne biryani with chicken.',
     price: 219.05,
-    image: '/categories/biryanis.png',
+    image: '/bestsellers/donne-chicken.png',
     customizable: true,
   },
 ]
