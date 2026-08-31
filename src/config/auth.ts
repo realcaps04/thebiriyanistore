@@ -1,7 +1,13 @@
-export const GOOGLE_CLIENT_ID = (
-  import.meta.env.VITE_GOOGLE_CLIENT_ID ??
+const FALLBACK_GOOGLE_CLIENT_ID =
   '830409557108-a88kdqif6bt5pvv66k9ao5t7om448ur5.apps.googleusercontent.com'
-).trim()
+
+const envClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const resolvedClientId =
+  typeof envClientId === 'string' && envClientId.trim().length > 0
+    ? envClientId.trim()
+    : FALLBACK_GOOGLE_CLIENT_ID
+
+export const GOOGLE_CLIENT_ID = resolvedClientId
 
 export const hasGoogleClientId = GOOGLE_CLIENT_ID.length > 0
 

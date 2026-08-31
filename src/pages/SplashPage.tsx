@@ -2,7 +2,6 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { BrandLockup } from '../components/BrandLockup'
-import { hasGoogleClientId } from '../config/auth'
 
 type SplashPageProps = {
   onLoginSuccess: (accessToken: string) => void
@@ -130,27 +129,6 @@ function SplashPageWithGoogle({ onLoginSuccess }: SplashPageProps) {
   )
 }
 
-function SplashPageWithoutGoogle() {
-  const [error, setError] = useState<string | null>(null)
-
-  const handleGoogleLogin = () => {
-    setError('Google sign-in is not configured for this deployment.')
-  }
-
-  return (
-    <SplashPageView
-      loading={false}
-      error={error}
-      onLogin={handleGoogleLogin}
-      onDismissError={() => setError(null)}
-    />
-  )
-}
-
 export function SplashPage(props: SplashPageProps) {
-  if (hasGoogleClientId) {
-    return <SplashPageWithGoogle {...props} />
-  }
-
-  return <SplashPageWithoutGoogle />
+  return <SplashPageWithGoogle {...props} />
 }
