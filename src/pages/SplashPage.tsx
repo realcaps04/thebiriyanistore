@@ -97,7 +97,12 @@ function SplashPageWithGoogle({ onLoginSuccess }: SplashPageProps) {
     onSuccess: (tokenResponse) => {
       setLoading(false)
       setError(null)
-      onLoginSuccess(tokenResponse.access_token)
+      const token = tokenResponse.access_token
+      if (!token) {
+        setError('Google sign-in completed but no token was returned. Please try again.')
+        return
+      }
+      onLoginSuccess(token)
     },
     onError: () => {
       setLoading(false)

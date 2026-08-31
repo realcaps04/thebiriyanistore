@@ -31,7 +31,6 @@ export function HomePage() {
               <img src="/brand/logo.png" alt="" className="w-full h-full object-contain p-1" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11.2px] text-muted font-medium truncate">{store.slug}</p>
               <h1 className="text-base font-bold text-ink leading-tight truncate">{store.name}</h1>
               <button className="flex items-center gap-1 text-[11.2px] text-muted mt-0.5 max-w-full">
                 <MapPin size={12} className="shrink-0 text-brand" />
@@ -116,7 +115,7 @@ export function HomePage() {
           </section>
 
           {/* Products */}
-          <section className="mt-6 pb-44">
+          <section className="mt-6 pb-36">
             <h2 className="section-title">All {activeLabel}&apos;s</h2>
             <div className="product-grid">
               {products.map((item) => (
@@ -153,25 +152,25 @@ export function HomePage() {
           </div>
         )}
 
-        {/* Bottom nav */}
-        <nav className="bottom-nav">
-          <button type="button" className="nav-item nav-item--active">
-            <Home size={22} />
+        {/* Bottom nav — floating pill */}
+        <nav className="bottom-nav" aria-label="Main navigation">
+          <button type="button" className="nav-item nav-item--active" aria-current="page">
+            <Home size={20} strokeWidth={2.25} />
             <span>Home</span>
           </button>
           <button type="button" className="nav-item">
-            <Store size={22} />
+            <Store size={20} strokeWidth={2} />
             <span>Stores</span>
           </button>
           <button type="button" className="nav-scan" aria-label="Quick order">
-            <ScanLine size={22} />
+            <ScanLine size={22} strokeWidth={2.25} />
           </button>
           <button type="button" className="nav-item">
-            <Menu size={22} />
+            <Menu size={20} strokeWidth={2} />
             <span>Menu</span>
           </button>
           <button type="button" className="nav-item">
-            <User size={22} />
+            <User size={20} strokeWidth={2} />
             <span>Profile</span>
           </button>
         </nav>

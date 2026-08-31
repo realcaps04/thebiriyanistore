@@ -1,6 +1,7 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import { PwaPrompts } from './components/PwaPrompts.tsx'
 import { GOOGLE_CLIENT_ID, hasGoogleClientId } from './config/auth.ts'
@@ -18,12 +19,16 @@ function AppShell({ children }: { children: ReactNode }) {
 const app = hasGoogleClientId ? (
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <AppShell>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </AppShell>
   </GoogleOAuthProvider>
 ) : (
   <AppShell>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </AppShell>
 )
 
