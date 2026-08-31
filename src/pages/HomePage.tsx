@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BottomNav } from '../components/BottomNav'
+import { OrderListCard } from '../components/OrderListCard'
 import { useCartSync, useOrdersSync } from '../hooks/useCartSync'
 import { bestSellers, biryanis, categories as categoryData, drinks, egg, products, store } from '../data/home'
 
@@ -103,36 +104,19 @@ export function HomePage() {
 
         <div className="home-scroll">
           {orders.length > 0 && (
-            <section>
-              <h2 className="section-title">Order&apos;s List</h2>
+            <section className="orders-section">
+              <div className="section-header">
+                <h2 className="section-title section-title--inline">Order&apos;s List</h2>
+                <button type="button" className="section-view-all" aria-label="See all orders">
+                  See all
+                  <span className="section-view-all__icon" aria-hidden>
+                    <ChevronRight size={11} strokeWidth={2.75} />
+                  </span>
+                </button>
+              </div>
               <div className="orders-row scrollbar-hide">
                 {orders.map((order) => (
-                  <article key={order.id} className="order-card">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-[11.2px] text-muted">Order {order.id}</p>
-                        <span className={`inline-block mt-1 text-[9.2px] font-semibold px-2 py-0.5 rounded-full ${order.statusColor}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1.5 mt-3">
-                      {order.items.map((src, i) => (
-                        <div key={i} className="order-thumb">
-                          <img src={src} alt="" />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-end justify-between mt-3">
-                      <div>
-                        <p className="text-sm font-bold text-ink">₹{Math.round(order.price)}</p>
-                        <p className="text-[10px] text-muted">{order.time}</p>
-                      </div>
-                      <p className="text-[10px] font-medium text-brand bg-brand/10 px-2 py-1 rounded-lg">
-                        {order.table}
-                      </p>
-                    </div>
-                  </article>
+                  <OrderListCard key={order.id} order={order} />
                 ))}
               </div>
             </section>

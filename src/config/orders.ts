@@ -1,8 +1,9 @@
 export type ActiveOrder = {
   id: string
   status: string
-  statusColor: string
+  orderType?: 'dine-in' | 'takeaway' | 'delivery'
   items: string[]
+  itemCount: number
   price: number
   time: string
   table: string

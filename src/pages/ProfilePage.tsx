@@ -5,15 +5,14 @@ import {
   MapPin,
   Package,
   Settings,
-  Sparkles,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useMutation } from 'convex/react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
 import { BottomNav } from '../components/BottomNav'
 import { useDeliveryAddresses } from '../components/DeliveryAddressSheet'
 import { clearAuth } from '../config/auth'
-import { store } from '../data/home'
 import { useAuthSession } from '../hooks/useAuthSession'
 import { useOrdersSync } from '../hooks/useCartSync'
 
@@ -24,6 +23,30 @@ function getInitials(name: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('')
+}
+
+type ProfileRowProps = {
+  icon: LucideIcon
+  label: string
+  hint: string
+  onClick?: () => void
+}
+
+function ProfileRow({ icon: Icon, label, hint, onClick }: ProfileRowProps) {
+  return (
+    <button type="button" className="profile-row" onClick={onClick}>
+      <span className="profile-row__icon" aria-hidden>
+        <Icon size={17} strokeWidth={2} />
+      </span>
+      <span className="profile-row__body">
+        <span className="profile-row__label">{label}</span>
+        <span className="profile-row__hint">{hint}</span>
+      </span>
+      <span className="profile-row__action" aria-hidden>
+        <ChevronRight size={14} strokeWidth={2.25} />
+      </span>
+    </button>
+  )
 }
 
 export function ProfilePage() {
@@ -37,6 +60,11 @@ export function ProfilePage() {
   const email = user?.email ?? ''
   const initials = getInitials(displayName) || 'TB'
 
+  const addressHint =
+    addresses.length > 0
+      ? `${addresses.length} saved address${addresses.length === 1 ? '' : 'es'}`
+      : 'Add home, work & more'
+
   const handleSignOut = async () => {
     if (token) {
       await revokeSession({ token })
@@ -48,111 +76,88 @@ export function ProfilePage() {
   return (
     <div className="shell">
       <main className="device profile-page">
-        <header className="profile-header">
-          <h1 className="profile-header__title">Profile</h1>
-        </header>
-
         <div className="profile-scroll">
-          <section className="profile-hero cart-card">
-            <div className="profile-hero__avatar-wrap">
+          <section className="profile-identity cart-card">
+            <div className="profile-identity__avatar-ring">
               {user?.picture ? (
-                <img src={user.picture} alt="" className="profile-hero__avatar" />
+                <img src={user.picture} alt="" className="profile-identity__avatar" />
               ) : (
-                <span className="profile-hero__initials">{initials}</span>
+                <span className="profile-identity__initials">{initials}</span>
               )}
-              <span className="profile-hero__badge">
-                <Sparkles size={11} aria-hidden />
-                Member
-              </span>
             </div>
-            <div className="profile-hero__body">
-              <h2 className="profile-hero__name">{displayName}</h2>
-              {email && <p className="profile-hero__email">{email}</p>}
-              <p className="profile-hero__store">{store.name} · {store.location}</p>
+
+            <span className="profile-identity__tier">Member</span>
+            <h1 className="profile-identity__name">{displayName}</h1>
+            {email && <p className="profile-identity__email">{email}</p>}
+
+            <div className="profile-identity__stats">
+              <div className="profile-identity__stat">
+                <span className="profile-identity__stat-value">{orders.length}</span>
+                <span className="profile-identity__stat-label">Active orders</span>
+              </div>
+              <div className="profile-identity__stat-divider" aria-hidden />
+              <div className="profile-identity__stat">
+                <span className="profile-identity__stat-value">{addresses.length}</span>
+                <span className="profile-identity__stat-label">Saved addresses</span>
+              </div>
             </div>
           </section>
 
-          <div className="profile-stats">
-            <div className="profile-stat cart-card">
-              <span className="profile-stat__value">{String(orders.length).padStart(2, '0')}</span>
-              <span className="profile-stat__label">Active orders</span>
-            </div>
-            <div className="profile-stat cart-card">
-              <span className="profile-stat__value">{String(addresses.length).padStart(2, '0')}</span>
-              <span className="profile-stat__label">Saved addresses</span>
-            </div>
-          </div>
-
-          <section className="profile-section">
-            <h2 className="profile-section__title">Account</h2>
-            <div className="profile-menu cart-card">
-              <button
-                type="button"
-                className="profile-menu__item"
+          <section className="profile-group">
+            <h2 className="profile-group__label">Account</h2>
+            <div className="profile-list cart-card">
+              <ProfileRow
+                icon={Package}
+                label="My orders"
+                hint="Track active and past orders"
                 onClick={() => navigate('/home')}
-              >
-                <span className="profile-menu__icon profile-menu__icon--orders">
-                  <Package size={17} aria-hidden />
-                </span>
-                <span className="profile-menu__text">
-                  <span className="profile-menu__label">My orders</span>
-                  <span className="profile-menu__hint">Track active & past orders</span>
-                </span>
-                <ChevronRight size={16} className="profile-menu__chevron" aria-hidden />
-              </button>
-              <button
-                type="button"
-                className="profile-menu__item"
+              />
+              <ProfileRow
+                icon={MapPin}
+                label="Delivery addresses"
+                hint={addressHint}
                 onClick={() => navigate('/cart')}
-              >
-                <span className="profile-menu__icon profile-menu__icon--address">
-                  <MapPin size={17} aria-hidden />
-                </span>
-                <span className="profile-menu__text">
-                  <span className="profile-menu__label">Delivery addresses</span>
-                  <span className="profile-menu__hint">
-                    {addresses.length > 0
-                      ? `${addresses.length} saved address${addresses.length === 1 ? '' : 'es'}`
-                      : 'Add home, work & more'}
-                  </span>
-                </span>
-                <ChevronRight size={16} className="profile-menu__chevron" aria-hidden />
-              </button>
+              />
             </div>
           </section>
 
-          <section className="profile-section">
-            <h2 className="profile-section__title">Support</h2>
-            <div className="profile-menu cart-card">
-              <button type="button" className="profile-menu__item">
-                <span className="profile-menu__icon profile-menu__icon--help">
-                  <HelpCircle size={17} aria-hidden />
-                </span>
-                <span className="profile-menu__text">
-                  <span className="profile-menu__label">Help & support</span>
-                  <span className="profile-menu__hint">FAQs and restaurant contact</span>
-                </span>
-                <ChevronRight size={16} className="profile-menu__chevron" aria-hidden />
-              </button>
-              <button type="button" className="profile-menu__item">
-                <span className="profile-menu__icon profile-menu__icon--settings">
-                  <Settings size={17} aria-hidden />
-                </span>
-                <span className="profile-menu__text">
-                  <span className="profile-menu__label">Preferences</span>
-                  <span className="profile-menu__hint">Notifications & language</span>
-                </span>
-                <ChevronRight size={16} className="profile-menu__chevron" aria-hidden />
-              </button>
+          <section className="profile-group">
+            <h2 className="profile-group__label">Support</h2>
+            <div className="profile-list cart-card">
+              <ProfileRow
+                icon={HelpCircle}
+                label="Help & support"
+                hint="FAQs and restaurant contact"
+              />
+              <ProfileRow
+                icon={Settings}
+                label="Preferences"
+                hint="Notifications and language"
+              />
             </div>
           </section>
 
-          <button type="button" className="profile-signout" onClick={() => void handleSignOut()}>
-            <LogOut size={18} aria-hidden />
-            Sign out
-          </button>
+          <section className="profile-group profile-group--signout">
+            <button
+              type="button"
+              className="profile-signout"
+              onClick={() => void handleSignOut()}
+            >
+              <LogOut size={16} strokeWidth={2} aria-hidden />
+              Sign out
+            </button>
+          </section>
 
-          <p className="profile-footer">Signed in with Google · Up to 4 devices</p>
+          <footer className="profile-footer">
+            <span className="profile-footer__badge">G</span>
+            <p className="profile-footer__text">
+              Signed in with Google
+              <span className="profile-footer__dot" aria-hidden>
+                ·
+              </span>
+              Up to 4 devices
+            </p>
+          </footer>
         </div>
 
         <BottomNav active="profile" />

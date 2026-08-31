@@ -27,8 +27,9 @@ export const listActiveOrders = query({
       .map((order) => ({
         id: order.displayOrderId,
         status: order.statusLabel,
-        statusColor: order.statusColor,
+        orderType: order.orderType,
         items: order.items.map((item) => item.image),
+        itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
         price: order.total,
         time: order.timeLabel,
         table: order.tableLabel,
