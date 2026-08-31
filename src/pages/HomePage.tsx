@@ -11,10 +11,13 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getActiveOrders, type ActiveOrder } from '../config/orders'
 import { bestSellers, biryanis, categories as categoryData, drinks, egg, products, store } from '../data/home'
 
 export function HomePage() {
+  const navigate = useNavigate()
+  const openProduct = (id: string) => navigate(`/product/${id}`)
   const [activeCategory, setActiveCategory] = useState('biryanis')
   const [mapOpen, setMapOpen] = useState(false)
   const [orders, setOrders] = useState<ActiveOrder[]>([])
@@ -139,7 +142,19 @@ export function HomePage() {
                 style={{ transform: `translateX(-${bestSellerIndex * 100}%)` }}
               >
                 {bestSellers.map((item) => (
-                  <article key={item.id} className="bestseller-card">
+                  <article
+                    key={item.id}
+                    className="bestseller-card bestseller-card--link"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openProduct(item.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        openProduct(item.id)
+                      }
+                    }}
+                  >
                     <div className="bestseller-card__image">
                       <img src={item.image} alt="" />
                     </div>
@@ -153,9 +168,9 @@ export function HomePage() {
                             <p className="bestseller-card__custom">Customization available</p>
                           )}
                         </div>
-                        <button type="button" className="bestseller-card__add">
-                          + Add
-                        </button>
+                        <span className="bestseller-card__view" aria-hidden>
+                          <ChevronRight size={16} />
+                        </span>
                       </div>
                     </div>
                   </article>
@@ -210,7 +225,12 @@ export function HomePage() {
               <h2 className="section-title">All {activeLabel}</h2>
               <div className="product-grid">
                 {categoryItems.map((item) => (
-                  <article key={item.id} className="product-card">
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="product-card product-card--link"
+                    onClick={() => openProduct(item.id)}
+                  >
                     <div className="product-image-wrap">
                       <img src={item.image} alt={item.name} />
                     </div>
@@ -224,7 +244,7 @@ export function HomePage() {
                         )}
                       </div>
                     </div>
-                  </article>
+                  </button>
                 ))}
               </div>
             </section>

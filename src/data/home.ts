@@ -198,7 +198,7 @@ export const drinks: MenuItem[] = [
     name: 'Fresh Lime',
     desc: 'Fresh Lime Juice',
     price: 47.62,
-    image: '/drinks/fresh-lime.jpg',
+    image: '/drinks/fresh-lime.png',
     customizable: false,
     categoryId: 'drinks',
   },

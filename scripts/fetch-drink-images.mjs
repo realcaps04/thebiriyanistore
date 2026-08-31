@@ -12,12 +12,12 @@ const items = [
     url: 'https://b.zmtcdn.com/data/dish_photos/7d6/03a8da214a0b8cba05de6b797c4927d6.png',
   },
   {
-    file: 'fresh-lime.jpg',
-    url: 'https://b.zmtcdn.com/data/dish_photos/fe2/3c49171752511e7424aea98540ddafe2.jpg',
+    file: 'fresh-lime.png',
+    url: 'https://b.zmtcdn.com/data/dish_photos/3b3/f9b5a1e0ae2f4bab5e316a8cb53d63b3.png',
   },
   {
     file: 'mirinda-330ml.png',
-    url: 'https://b.zmtcdn.com/data/dish_photos/3b3/f9b5a1e0ae2f4bab5e316a8cb53d63b3.png',
+    url: 'https://b.zmtcdn.com/data/dish_photos/f87/0141846153aa57d6883fc6e6bb896f87.png',
   },
   {
     file: 'pepsi-330ml.png',
