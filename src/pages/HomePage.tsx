@@ -18,8 +18,8 @@ export function HomePage() {
   const [activeCategory, setActiveCategory] = useState('biryanis')
   const [mapOpen, setMapOpen] = useState(false)
   const [orders, setOrders] = useState<ActiveOrder[]>([])
-  const cartCount = 1
-  const cartTotal = 439.17
+  const cartCount = 0
+  const cartTotal = 0
 
   useEffect(() => {
     setOrders(getActiveOrders())
@@ -119,36 +119,53 @@ export function HomePage() {
           )}
 
           {/* Best Sellers */}
-          <section className={orders.length > 0 ? 'mt-6' : ''}>
+          <section className={`bestsellers-section ${orders.length > 0 ? 'mt-6' : ''}`}>
             <h2 className="section-title">Best Sellers</h2>
-            <div className="bestsellers-row scrollbar-hide">
-              {bestSellers.map((item) => (
-                <article key={item.id} className="bestseller-card">
-                  <div className="bestseller-card__image">
-                    <img src={item.image} alt="" />
-                  </div>
-                  <div className="bestseller-card__body">
-                    <h3 className="bestseller-card__title">{item.name}</h3>
-                    <p className="bestseller-card__desc">{item.desc}</p>
-                    <div className="bestseller-card__footer">
-                      <div>
-                        <p className="bestseller-card__price">₹{item.price.toFixed(2)}</p>
-                        {item.customizable && (
-                          <p className="bestseller-card__custom">Customization available</p>
-                        )}
-                      </div>
-                      <button type="button" className="bestseller-card__add">
-                        + Add
-                      </button>
+            <div className="bestsellers-carousel" aria-live="polite">
+              <div
+                className="bestsellers-track"
+                style={{ transform: `translateX(-${bestSellerIndex * 100}%)` }}
+              >
+                {bestSellers.map((item) => (
+                  <article key={item.id} className="bestseller-card">
+                    <div className="bestseller-card__image">
+                      <img src={item.image} alt="" />
                     </div>
-                  </div>
-                </article>
-              ))}
+                    <div className="bestseller-card__body">
+                      <h3 className="bestseller-card__title">{item.name}</h3>
+                      <p className="bestseller-card__desc">{item.desc}</p>
+                      <div className="bestseller-card__footer">
+                        <div>
+                          <p className="bestseller-card__price">₹{item.price.toFixed(2)}</p>
+                          {item.customizable && (
+                            <p className="bestseller-card__custom">Customization available</p>
+                          )}
+                        </div>
+                        <button type="button" className="bestseller-card__add">
+                          + Add
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <div className="bestsellers-dots" aria-hidden={bestSellers.length <= 1}>
+                {bestSellers.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`bestsellers-dot ${index === bestSellerIndex ? 'bestsellers-dot--active' : ''}`}
+                    aria-label={`Show ${item.name}`}
+                    aria-current={index === bestSellerIndex ? 'true' : undefined}
+                    onClick={() => setBestSellerIndex(index)}
+                  />
+                ))}
+              </div>
             </div>
           </section>
 
           {/* Categories */}
-          <section className="mt-6">
+          <section className="categories-section mt-6">
             <div className="section-header">
               <h2 className="section-title section-title--inline">Search By Categories</h2>
               <button type="button" className="section-view-all">

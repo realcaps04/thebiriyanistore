@@ -502,18 +502,23 @@ body {
   padding: 0 1.25rem;
 }
 
-.bestsellers-row {
-  display: flex;
-  gap: 0.875rem;
-  overflow-x: auto;
+.bestsellers-section {
+  margin-bottom: 1.25rem;
+}
+
+.bestsellers-carousel {
+  overflow: hidden;
   padding: 0 1.25rem;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
+}
+
+.bestsellers-track {
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bestseller-card {
-  flex: 0 0 16.5rem;
-  width: 16.5rem;
+  flex: 0 0 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 0.75rem;
@@ -523,7 +528,36 @@ body {
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.65);
   box-shadow: 0 8px 28px rgba(31, 90, 64, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  scroll-snap-align: start;
+}
+
+.bestsellers-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.bestsellers-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(31, 90, 64, 0.2);
+  cursor: pointer;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.bestsellers-dot--active {
+  width: 1.125rem;
+  background: var(--color-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bestsellers-track {
+    transition: none;
+  }
 }
 
 .bestseller-card__image {
@@ -640,12 +674,15 @@ body {
   object-fit: cover;
 }
 
+.categories-section {
+  margin-bottom: 1.75rem;
+}
+
 .categories-row {
   display: flex;
   gap: 0.75rem;
   overflow-x: auto;
   padding: 0 1.25rem;
-  margin-bottom: 1.25rem;
 }
 
 .category-pill {
