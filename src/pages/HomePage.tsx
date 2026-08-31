@@ -2,7 +2,7 @@ import {
   Bell,
   ChevronRight,
   Home,
-  Menu,
+  ClipboardList,
   ScanLine,
   Search,
   ShoppingCart,
@@ -20,6 +20,7 @@ export function HomePage() {
   const openProduct = (id: string) => navigate(`/product/${id}`)
   const [activeCategory, setActiveCategory] = useState('biryanis')
   const [mapOpen, setMapOpen] = useState(false)
+  const [comboComingSoonOpen, setComboComingSoonOpen] = useState(false)
   const [orders, setOrders] = useState<ActiveOrder[]>([])
   const cartCount = 0
   const cartTotal = 0
@@ -270,7 +271,11 @@ export function HomePage() {
             <Home size={20} strokeWidth={2.25} />
             <span>Home</span>
           </button>
-          <button type="button" className="nav-item">
+          <button
+            type="button"
+            className="nav-item"
+            onClick={() => setComboComingSoonOpen(true)}
+          >
             <Store size={20} strokeWidth={2} />
             <span>Combo</span>
           </button>
@@ -278,14 +283,45 @@ export function HomePage() {
             <ScanLine size={22} strokeWidth={2.25} />
           </button>
           <button type="button" className="nav-item">
-            <Menu size={20} strokeWidth={2} />
-            <span>Menu</span>
+            <ClipboardList size={20} strokeWidth={2} />
+            <span>Orders</span>
           </button>
           <button type="button" className="nav-item">
             <User size={20} strokeWidth={2} />
             <span>Profile</span>
           </button>
         </nav>
+
+        {comboComingSoonOpen && (
+          <div
+            className="login-popup-backdrop"
+            role="presentation"
+            onClick={() => setComboComingSoonOpen(false)}
+          >
+            <div
+              className="login-popup"
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="combo-popup-title"
+              aria-describedby="combo-popup-message"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h3 id="combo-popup-title" className="login-popup-title">
+                Coming soon
+              </h3>
+              <p id="combo-popup-message" className="login-popup-message">
+                Combo meals are on the way. Check back soon for bundled deals and special offers.
+              </p>
+              <button
+                type="button"
+                className="login-popup-btn"
+                onClick={() => setComboComingSoonOpen(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
 
         {mapOpen && (
           <div
