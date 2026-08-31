@@ -2,19 +2,20 @@ import {
   Bell,
   ChevronRight,
   Home,
-  MapPin,
   Menu,
   ScanLine,
   Search,
   SlidersHorizontal,
   Store,
   User,
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { activeOrders, categories as categoryData, products, store } from '../data/home'
 
 export function HomePage() {
   const [activeCategory, setActiveCategory] = useState('chicken')
+  const [mapOpen, setMapOpen] = useState(false)
   const cartCount = 1
   const cartTotal = 439.17
 
@@ -26,19 +27,37 @@ export function HomePage() {
       <main className="device home-page">
         {/* Header */}
         <header className="home-header">
+          <div className="home-header__left">
+            <div className="store-logo store-logo--sm">
+              <img src="/brand/logo.png" alt="" className="w-full h-full object-contain p-0.5" />
+            </div>
+          </div>
+          <div className="home-header__text">
+            <h1 className="home-header__title">{store.name}</h1>
+            <div className="home-header__location-block">
+              {store.locationLines.map((line, index) => (
+                <span key={line} className="home-header__location">
+                  <span className="home-header__sep" aria-hidden>
+                    ·
+                  </span>
+                  <span className="home-header__address">{line}</span>
+                  {index === store.locationLines.length - 1 && (
+                    <button
+                      type="button"
+                      className="home-header__map-btn"
+                      aria-label="Open in Google Maps"
+                      onClick={() => setMapOpen(true)}
+                    >
+                      <img src="/brand/google-maps.svg" alt="" className="home-header__map-logo" />
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
           <button type="button" className="icon-btn home-header__notify" aria-label="Notifications">
             <Bell size={20} />
           </button>
-          <div className="home-header__brand">
-            <div className="store-logo">
-              <img src="/brand/logo.png" alt="" className="w-full h-full object-contain p-1" />
-            </div>
-            <h1 className="home-header__title">{store.name}</h1>
-            <button type="button" className="home-header__location">
-              <MapPin size={12} className="shrink-0 text-brand" />
-              <span>{store.locationDetail}</span>
-            </button>
-          </div>
         </header>
 
         {/* Search */}
@@ -171,6 +190,46 @@ export function HomePage() {
             <span>Profile</span>
           </button>
         </nav>
+
+        {mapOpen && (
+          <div
+            className="map-popup-backdrop"
+            role="presentation"
+            onClick={() => setMapOpen(false)}
+          >
+            <div
+              className="map-popup"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="map-popup-title"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="map-popup__head">
+                <h2 id="map-popup-title" className="map-popup__title">
+                  {store.name}
+                </h2>
+                <button
+                  type="button"
+                  className="map-popup__close"
+                  aria-label="Close map"
+                  onClick={() => setMapOpen(false)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <p className="map-popup__address">{store.locationDetail}</p>
+              <div className="map-popup__frame">
+                <iframe
+                  src={store.mapEmbedUrl}
+                  title={`${store.name} on Google Maps`}
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
