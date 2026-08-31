@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { BrandLockup } from '../components/BrandLockup'
 
 type SplashPageProps = {
-  onLoginSuccess: (accessToken: string) => void
+  onLoginSuccess: (accessToken: string) => void | Promise<void>
+  loading?: boolean
 }
 
 function GoogleIcon() {
@@ -88,12 +89,12 @@ function SplashPageView({ loading, error, onLogin, onDismissError }: SplashPageV
   )
 }
 
-function SplashPageWithGoogle({ onLoginSuccess }: SplashPageProps) {
+function SplashPageWithGoogle({ onLoginSuccess, loading: syncing }: SplashPageProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const googleLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
+    onSuccess: async (tokenResponse) => {
       setLoading(false)
       setError(null)
       const token = tokenResponse.access_token
@@ -101,7 +102,11 @@ function SplashPageWithGoogle({ onLoginSuccess }: SplashPageProps) {
         setError('Google sign-in completed but no token was returned. Please try again.')
         return
       }
-      onLoginSuccess(token)
+      try {
+        await onLoginSuccess(token)
+      } catch {
+        setError('Could not finish sign-in. Please try again.')
+      }
     },
     onError: () => {
       setLoading(false)
@@ -121,7 +126,7 @@ function SplashPageWithGoogle({ onLoginSuccess }: SplashPageProps) {
 
   return (
     <SplashPageView
-      loading={loading}
+      loading={loading || Boolean(syncing)}
       error={error}
       onLogin={handleGoogleLogin}
       onDismissError={() => setError(null)}

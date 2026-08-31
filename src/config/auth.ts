@@ -11,7 +11,30 @@ export const GOOGLE_CLIENT_ID = resolvedClientId
 
 export const hasGoogleClientId = GOOGLE_CLIENT_ID.length > 0
 
-export const AUTH_STORAGE_KEY = 'tbs_google_token'
+export const AUTH_STORAGE_KEY = 'tbs_session_token'
+export const USER_STORAGE_KEY = 'tbs_user'
+
+export type StoredUser = {
+  id: string
+  email: string
+  name: string
+  picture: string | null
+}
+
+export function getStoredUser(): StoredUser | null {
+  try {
+    const raw = localStorage.getItem(USER_STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as StoredUser
+  } catch {
+    return null
+  }
+}
+
+export function saveAuthSession(token: string, user: StoredUser) {
+  localStorage.setItem(AUTH_STORAGE_KEY, token)
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+}
 
 export function isLoggedIn() {
   return Boolean(localStorage.getItem(AUTH_STORAGE_KEY))
@@ -19,4 +42,5 @@ export function isLoggedIn() {
 
 export function clearAuth() {
   localStorage.removeItem(AUTH_STORAGE_KEY)
+  localStorage.removeItem(USER_STORAGE_KEY)
 }
