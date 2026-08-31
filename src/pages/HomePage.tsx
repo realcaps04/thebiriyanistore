@@ -10,17 +10,23 @@ import {
   User,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
-import { activeOrders, categories as categoryData, products, store } from '../data/home'
+import { useEffect, useState } from 'react'
+import { getActiveOrders, type ActiveOrder } from '../config/orders'
+import { categories as categoryData, products, store } from '../data/home'
 
 export function HomePage() {
-  const [activeCategory, setActiveCategory] = useState('chicken')
+  const [activeCategory, setActiveCategory] = useState('biryanis')
   const [mapOpen, setMapOpen] = useState(false)
+  const [orders, setOrders] = useState<ActiveOrder[]>([])
   const cartCount = 1
   const cartTotal = 439.17
 
+  useEffect(() => {
+    setOrders(getActiveOrders())
+  }, [])
+
   const activeLabel =
-    categoryData.find((c) => c.id === activeCategory)?.label ?? 'Chicken'
+    categoryData.find((c) => c.id === activeCategory)?.label ?? 'Biryanis'
 
   return (
     <div className="shell">
@@ -66,44 +72,51 @@ export function HomePage() {
         </div>
 
         <div className="home-scroll">
-          {/* Orders */}
-          <section>
-            <h2 className="section-title">Order&apos;s List</h2>
-            <div className="orders-row scrollbar-hide">
-              {activeOrders.map((order) => (
-                <article key={order.id} className="order-card">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-[11.2px] text-muted">Order {order.id}</p>
-                      <span className={`inline-block mt-1 text-[9.2px] font-semibold px-2 py-0.5 rounded-full ${order.statusColor}`}>
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex gap-1.5 mt-3">
-                    {order.items.map((src, i) => (
-                      <div key={i} className="order-thumb">
-                        <img src={src} alt="" />
+          {orders.length > 0 && (
+            <section>
+              <h2 className="section-title">Order&apos;s List</h2>
+              <div className="orders-row scrollbar-hide">
+                {orders.map((order) => (
+                  <article key={order.id} className="order-card">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-[11.2px] text-muted">Order {order.id}</p>
+                        <span className={`inline-block mt-1 text-[9.2px] font-semibold px-2 py-0.5 rounded-full ${order.statusColor}`}>
+                          {order.status}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex items-end justify-between mt-3">
-                    <div>
-                      <p className="text-sm font-bold text-ink">₹{order.price}</p>
-                      <p className="text-[10px] text-muted">{order.time}</p>
                     </div>
-                    <p className="text-[10px] font-medium text-brand bg-brand/10 px-2 py-1 rounded-lg">
-                      {order.table}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+                    <div className="flex gap-1.5 mt-3">
+                      {order.items.map((src, i) => (
+                        <div key={i} className="order-thumb">
+                          <img src={src} alt="" />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-end justify-between mt-3">
+                      <div>
+                        <p className="text-sm font-bold text-ink">₹{order.price}</p>
+                        <p className="text-[10px] text-muted">{order.time}</p>
+                      </div>
+                      <p className="text-[10px] font-medium text-brand bg-brand/10 px-2 py-1 rounded-lg">
+                        {order.table}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Categories */}
-          <section className="mt-6">
-            <h2 className="section-title">Search By Categories</h2>
+          <section className={orders.length > 0 ? 'mt-6' : ''}>
+            <div className="section-header">
+              <h2 className="section-title section-title--inline">Search By Categories</h2>
+              <button type="button" className="section-view-all">
+                View all
+                <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
+              </button>
+            </div>
             <div className="categories-row scrollbar-hide">
               {categoryData.map((cat) => {
                 const isActive = activeCategory === cat.id
@@ -126,7 +139,7 @@ export function HomePage() {
 
           {/* Products */}
           <section className="mt-6 pb-36">
-            <h2 className="section-title">All {activeLabel}&apos;s</h2>
+            <h2 className="section-title">All {activeLabel}</h2>
             <div className="product-grid">
               {products.map((item) => (
                 <article key={item.id} className="product-card">
