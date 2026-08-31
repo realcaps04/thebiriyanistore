@@ -189,7 +189,7 @@ export const drinks: MenuItem[] = [
     name: '7 UP 330ml CAN',
     desc: '330 ml 7 UP',
     price: 66.67,
-    image: '/categories/drinks.jpg',
+    image: '/drinks/7up-330ml.png',
     customizable: false,
     categoryId: 'drinks',
   },
@@ -198,7 +198,7 @@ export const drinks: MenuItem[] = [
     name: 'Fresh Lime',
     desc: 'Fresh Lime Juice',
     price: 47.62,
-    image: '/categories/drinks.jpg',
+    image: '/drinks/fresh-lime.jpg',
     customizable: false,
     categoryId: 'drinks',
   },
@@ -207,7 +207,7 @@ export const drinks: MenuItem[] = [
     name: 'Mirinda 330ml CAN',
     desc: '330 ml can Mirinda',
     price: 66.67,
-    image: '/categories/drinks.jpg',
+    image: '/drinks/mirinda-330ml.png',
     customizable: false,
     categoryId: 'drinks',
   },
@@ -216,7 +216,7 @@ export const drinks: MenuItem[] = [
     name: 'Pepsi 330ml CAN',
     desc: '330 ml Pepsi',
     price: 66.67,
-    image: '/categories/drinks.jpg',
+    image: '/drinks/pepsi-330ml.png',
     customizable: false,
     categoryId: 'drinks',
   },
@@ -225,9 +225,21 @@ export const drinks: MenuItem[] = [
     name: 'Zero Pepsi 330ml Can',
     desc: 'Zero Sugar Pepsi 330 ml CAN',
     price: 66.67,
-    image: '/categories/drinks.jpg',
+    image: '/drinks/zero-pepsi-330ml.jpg',
     customizable: false,
     categoryId: 'drinks',
+  },
+]
+
+export const egg: MenuItem[] = [
+  {
+    id: 'egg-boiled',
+    name: 'Egg Boiled [ 1 pc ]',
+    desc: 'Perfectly boiled egg',
+    price: 14.29,
+    image: '/egg/egg-boiled.jpg',
+    customizable: false,
+    categoryId: 'egg',
   },
 ]
 

@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 .env
+.env.local
+
+# Scraped debug artifacts (must not be committed)
+scripts/zomato.html
+scripts/zomato-state-sample.json
 
 # Editor directories and files
 .vscode/*

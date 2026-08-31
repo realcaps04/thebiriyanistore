@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",
-    "process:bestsellers": "node scripts/process-bestseller-images.mjs"
+    "process:bestsellers": "node scripts/process-bestseller-images.mjs",
+    "fetch:drinks": "node scripts/fetch-drink-images.mjs",
+    "fetch:egg": "node scripts/fetch-egg-image.mjs"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",

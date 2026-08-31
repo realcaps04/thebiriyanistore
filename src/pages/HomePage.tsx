@@ -5,14 +5,14 @@ import {
   Menu,
   ScanLine,
   Search,
-  SlidersHorizontal,
+  ShoppingCart,
   Store,
   User,
   X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getActiveOrders, type ActiveOrder } from '../config/orders'
-import { bestSellers, biryanis, categories as categoryData, drinks, products, store } from '../data/home'
+import { bestSellers, biryanis, categories as categoryData, drinks, egg, products, store } from '../data/home'
 
 export function HomePage() {
   const [activeCategory, setActiveCategory] = useState('biryanis')
@@ -41,6 +41,7 @@ export function HomePage() {
   const categoryMenus: Record<string, typeof biryanis> = {
     biryanis,
     drinks,
+    egg,
   }
 
   const categoryItems =
@@ -87,8 +88,8 @@ export function HomePage() {
             <Search size={18} className="text-muted shrink-0" />
             <input type="search" placeholder="What are you looking for?" />
           </div>
-          <button type="button" className="filter-btn" aria-label="Filters">
-            <SlidersHorizontal size={18} />
+          <button type="button" className="cart-btn" aria-label="Cart">
+            <ShoppingCart size={18} />
           </button>
         </div>
 
@@ -251,7 +252,7 @@ export function HomePage() {
           </button>
           <button type="button" className="nav-item">
             <Store size={20} strokeWidth={2} />
-            <span>Stores</span>
+            <span>Combo</span>
           </button>
           <button type="button" className="nav-scan" aria-label="Quick order">
             <ScanLine size={22} strokeWidth={2.25} />
