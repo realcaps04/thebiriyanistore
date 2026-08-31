@@ -6,18 +6,12 @@ export function getMenuItemById(id: string): MenuItem | undefined {
   return allItems.find((item) => item.id === id)
 }
 
-export type ProductSizeOption = {
-  id: string
-  label: string
-  detail: string
-  price: number
-}
-
 export type AddonGroupItem = {
   id: string
   name: string
   price: number
   menuItemId?: string
+  image?: string
 }
 
 export type ProductAddonGroup = {
@@ -97,6 +91,7 @@ const chickenFryGroup: ProductAddonGroup = {
       name: 'Chicken Fry - Small',
       price: 152.38,
       menuItemId: 'bs-chicken-fry',
+      image: '/bestsellers/chicken-fry.jpg',
     },
   ],
 }
@@ -107,6 +102,7 @@ function buildDrinkGroup(): ProductAddonGroup {
     name: drink.name,
     price: drink.price,
     menuItemId: drink.id,
+    image: drink.image,
   }))
 
   return {
@@ -138,23 +134,6 @@ export function getProductAddonGroups(item: MenuItem): ProductAddonGroup[] {
   }
 
   return groups
-}
-
-export function getProductSizes(item: MenuItem): ProductSizeOption[] {
-  const name = item.name.toLowerCase()
-
-  if (name.includes('mini') || name.includes('rice only')) {
-    return [{ id: 'standard', label: 'Standard', detail: item.desc, price: item.price }]
-  }
-
-  if (!item.customizable) {
-    return [{ id: 'standard', label: 'Standard', detail: item.desc, price: item.price }]
-  }
-
-  return [
-    { id: 'regular', label: 'Regular', detail: 'Full portion serving', price: item.price },
-    { id: 'mini', label: 'Mini', detail: 'Single piece serving', price: 152.38 },
-  ]
 }
 
 export function isBestSeller(id: string): boolean {

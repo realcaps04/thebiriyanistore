@@ -15,7 +15,6 @@ import {
   getMenuItemById,
   getProductAddonGroups,
   getProductDetails,
-  getProductSizes,
   isBestSeller,
   type ProductAddonGroup,
 } from '../data/menu'
@@ -37,19 +36,15 @@ export function ProductPage() {
   const navigate = useNavigate()
   const item = id ? getMenuItemById(id) : undefined
 
-  const sizes = useMemo(() => (item ? getProductSizes(item) : []), [item])
   const addonGroups = useMemo(() => (item ? getProductAddonGroups(item) : []), [item])
   const details = item ? getProductDetails(item) : ''
 
-  const [sizeId, setSizeId] = useState(() => sizes[0]?.id ?? 'standard')
   const [groupSelections, setGroupSelections] = useState<Record<string, string[]>>({})
   const [specialInstructions, setSpecialInstructions] = useState('')
 
   if (!item) {
     return <Navigate to="/home" replace />
   }
-
-  const selectedSize = sizes.find((size) => size.id === sizeId) ?? sizes[0]
 
   const selectedAddons = addonGroups.flatMap((group) => {
     const ids = groupSelections[group.id] ?? []
@@ -64,7 +59,7 @@ export function ProductPage() {
   })
 
   const addonTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0)
-  const total = (selectedSize?.price ?? item.price) + addonTotal
+  const total = item.price + addonTotal
   const addonCount = selectedAddons.length
 
   const handleGroupToggle = (group: ProductAddonGroup, addonId: string) => {
@@ -79,9 +74,9 @@ export function ProductPage() {
       menuItemId: item.id,
       name: item.name,
       image: item.image,
-      sizeId: selectedSize?.id ?? 'standard',
-      sizeLabel: selectedSize?.label ?? 'Standard',
-      basePrice: selectedSize?.price ?? item.price,
+      sizeId: 'standard',
+      sizeLabel: 'Standard',
+      basePrice: item.price,
       addons: selectedAddons,
       specialInstructions: specialInstructions.trim(),
       quantity: 1,
@@ -91,7 +86,6 @@ export function ProductPage() {
 
   const summaryParts = [
     item.name,
-    sizes.length > 1 ? selectedSize?.label : null,
     addonCount > 0 ? `+${addonCount} add-on${addonCount > 1 ? 's' : ''}` : null,
   ].filter(Boolean)
 
@@ -133,9 +127,7 @@ export function ProductPage() {
                   <Star size={14} className="product-hero__star" aria-hidden />
                   4.9 (2.4k)
                 </span>
-                <span className="product-hero__meta-item">
-                  ₹{(selectedSize?.price ?? item.price).toFixed(2)}
-                </span>
+                <span className="product-hero__meta-item">₹{item.price.toFixed(2)}</span>
                 {item.customizable && (
                   <span className="product-hero__meta-item">
                     <Flame size={14} aria-hidden />
@@ -149,34 +141,14 @@ export function ProductPage() {
             </div>
           </section>
 
-          {sizes.length > 1 && (
-            <section className="product-section">
-              <h2 className="product-section__title">Select Size</h2>
-              <div className="product-size-row scrollbar-hide">
-                {sizes.map((size) => {
-                  const active = size.id === sizeId
-                  return (
-                    <button
-                      key={size.id}
-                      type="button"
-                      className={`product-size-card ${active ? 'product-size-card--active' : ''}`}
-                      onClick={() => setSizeId(size.id)}
-                    >
-                      <span
-                        className={`product-size-card__radio ${active ? 'product-size-card__radio--active' : ''}`}
-                      />
-                      <span className="product-size-card__label">{size.label}</span>
-                      <span className="product-size-card__detail">{size.detail}</span>
-                      <span className="product-size-card__price">₹{size.price.toFixed(2)}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </section>
-          )}
+          <section className="product-section">
+            <h2 className="product-section__title">Description</h2>
+            <p className="product-description">{details}</p>
+          </section>
 
           {addonGroups.map((group) => {
             const selected = groupSelections[group.id] ?? []
+            const isDrinkGroup = group.id === 'drinks'
             return (
               <section key={group.id} className="product-section">
                 <div className="product-addon-group__head">
@@ -187,35 +159,67 @@ export function ProductPage() {
                     {selected.length}/{group.max}
                   </span>
                 </div>
-                <div className="product-addon-list">
-                  {group.items.map((addon) => {
-                    const active = selected.includes(addon.id)
-                    const disabled = !active && selected.length >= group.max
-                    return (
-                      <button
-                        key={addon.id}
-                        type="button"
-                        className={`product-addon-row ${active ? 'product-addon-row--active' : ''} ${disabled ? 'product-addon-row--disabled' : ''}`}
-                        onClick={() => handleGroupToggle(group, addon.id)}
-                        disabled={disabled}
-                      >
-                        <span
-                          className={`product-addon-row__check ${active ? 'product-addon-row__check--active' : ''}`}
-                          aria-hidden
+                {isDrinkGroup ? (
+                  <div className="product-addon-card-grid scrollbar-hide">
+                    {group.items.map((addon) => {
+                      const active = selected.includes(addon.id)
+                      const disabled = !active && selected.length >= group.max
+                      return (
+                        <button
+                          key={addon.id}
+                          type="button"
+                          className={`product-addon-card ${active ? 'product-addon-card--active' : ''} ${disabled ? 'product-addon-card--disabled' : ''}`}
+                          onClick={() => handleGroupToggle(group, addon.id)}
+                          disabled={disabled}
                         >
-                          {active && <Check size={12} strokeWidth={3} />}
-                        </span>
-                        <span className="product-addon-row__name">{addon.name}</span>
-                        <span className="product-addon-row__price">₹{addon.price.toFixed(2)}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+                          <div className="product-addon-card__image-wrap">
+                            {addon.image && (
+                              <img src={addon.image} alt="" className="product-addon-card__image" />
+                            )}
+                            <span
+                              className={`product-addon-card__check ${active ? 'product-addon-card__check--active' : ''}`}
+                              aria-hidden
+                            >
+                              {active && <Check size={11} strokeWidth={3} />}
+                            </span>
+                          </div>
+                          <span className="product-addon-card__name">{addon.name}</span>
+                          <span className="product-addon-card__price">₹{addon.price.toFixed(2)}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="product-addon-list">
+                    {group.items.map((addon) => {
+                      const active = selected.includes(addon.id)
+                      const disabled = !active && selected.length >= group.max
+                      return (
+                        <button
+                          key={addon.id}
+                          type="button"
+                          className={`product-addon-row ${active ? 'product-addon-row--active' : ''} ${disabled ? 'product-addon-row--disabled' : ''}`}
+                          onClick={() => handleGroupToggle(group, addon.id)}
+                          disabled={disabled}
+                        >
+                          <span
+                            className={`product-addon-row__check ${active ? 'product-addon-row__check--active' : ''}`}
+                            aria-hidden
+                          >
+                            {active && <Check size={12} strokeWidth={3} />}
+                          </span>
+                          <span className="product-addon-row__name">{addon.name}</span>
+                          <span className="product-addon-row__price">₹{addon.price.toFixed(2)}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </section>
             )
           })}
 
-          <section className="product-section">
+          <section className="product-section product-section--last">
             <h2 className="product-section__title">Special Instructions</h2>
             <textarea
               className="product-instructions"
@@ -226,11 +230,6 @@ export function ProductPage() {
               maxLength={200}
             />
             <p className="product-instructions__hint">{specialInstructions.length}/200</p>
-          </section>
-
-          <section className="product-section product-section--last">
-            <h2 className="product-section__title">Description</h2>
-            <p className="product-description">{details}</p>
           </section>
         </div>
 

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getCartSummary } from '../config/cart'
 import { getActiveOrders, type ActiveOrder } from '../config/orders'
 import { bestSellers, biryanis, categories as categoryData, drinks, egg, products, store } from '../data/home'
 
@@ -22,11 +23,19 @@ export function HomePage() {
   const [mapOpen, setMapOpen] = useState(false)
   const [comboComingSoonOpen, setComboComingSoonOpen] = useState(false)
   const [orders, setOrders] = useState<ActiveOrder[]>([])
-  const cartCount = 0
-  const cartTotal = 0
+  const [cartCount, setCartCount] = useState(0)
+  const [cartTotal, setCartTotal] = useState(0)
 
   useEffect(() => {
     setOrders(getActiveOrders())
+    const refreshCart = () => {
+      const summary = getCartSummary()
+      setCartCount(summary.count)
+      setCartTotal(summary.total)
+    }
+    refreshCart()
+    window.addEventListener('cart-updated', refreshCart)
+    return () => window.removeEventListener('cart-updated', refreshCart)
   }, [])
 
   const [bestSellerIndex, setBestSellerIndex] = useState(0)
