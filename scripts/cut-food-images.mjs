@@ -61,6 +61,6 @@ async function exportCrop(x, y, w, h, outName, tolerance = 28) {
 
 // Stop above the mockup home-indicator bar at the bottom of the reference.
 await exportCrop(0, 835, 278, 165, 'food-biryani.png', 26)
-await exportCrop(218, 840, 255, 160, 'food-sides.png', 26)
+await exportCrop(240, 845, 233, 155, 'food-sides.png', 24)
 
 console.log('Saved clean food PNGs')

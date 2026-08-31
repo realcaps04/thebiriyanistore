@@ -34,11 +34,15 @@ export function PwaPrompts() {
   const updateSWRef = useRef<(reload?: boolean) => Promise<void>>(() => Promise.resolve())
 
   useEffect(() => {
-    updateSWRef.current = registerSW({
-      onNeedRefresh() {
-        setShowUpdate(true)
-      },
-    })
+    try {
+      updateSWRef.current = registerSW({
+        onNeedRefresh() {
+          setShowUpdate(true)
+        },
+      })
+    } catch {
+      // Service worker unavailable in this environment.
+    }
   }, [])
 
   useEffect(() => {

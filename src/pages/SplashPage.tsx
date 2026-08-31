@@ -2,6 +2,7 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { BrandLockup } from '../components/BrandLockup'
+import { hasGoogleClientId } from '../config/auth'
 
 type SplashPageProps = {
   onLoginSuccess: (accessToken: string) => void
@@ -30,7 +31,78 @@ function GoogleIcon() {
   )
 }
 
-export function SplashPage({ onLoginSuccess }: SplashPageProps) {
+type SplashPageViewProps = {
+  loading: boolean
+  error: string | null
+  onLogin: () => void
+  onDismissError: () => void
+}
+
+function SplashPageView({ loading, error, onLogin, onDismissError }: SplashPageViewProps) {
+  return (
+    <div className="shell shell--welcome">
+      <main className="device welcome-page">
+        <section className="welcome-top">
+          <BrandLockup />
+        </section>
+
+        <svg className="welcome-curve" viewBox="0 0 430 48" preserveAspectRatio="none" aria-hidden>
+          <path d="M0 48 C120 8 310 8 430 48 L430 48 L0 48 Z" fill="#dce4d3" />
+        </svg>
+
+        <section className="welcome-bottom">
+          <button type="button" className="google-btn" onClick={onLogin} disabled={loading}>
+            <GoogleIcon />
+            {loading ? 'Signing in…' : 'Continue with Google'}
+          </button>
+
+          <p className="secure-badge">
+            <ShieldCheck size={16} strokeWidth={2.25} />
+            Secure &amp; Private
+          </p>
+
+          <img
+            src="/brand/food-biryani.png"
+            alt=""
+            className="welcome-food welcome-food--left"
+            draggable={false}
+          />
+          <img
+            src="/brand/food-sides.png"
+            alt=""
+            className="welcome-food welcome-food--right"
+            draggable={false}
+          />
+        </section>
+
+        {error && (
+          <div className="login-popup-backdrop" role="presentation" onClick={onDismissError}>
+            <div
+              className="login-popup"
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="login-popup-title"
+              aria-describedby="login-popup-message"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h3 id="login-popup-title" className="login-popup-title">
+                Sign-in failed
+              </h3>
+              <p id="login-popup-message" className="login-popup-message">
+                {error}
+              </p>
+              <button type="button" className="login-popup-btn" onClick={onDismissError}>
+                OK
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}
+
+function SplashPageWithGoogle({ onLoginSuccess }: SplashPageProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -57,77 +129,36 @@ export function SplashPage({ onLoginSuccess }: SplashPageProps) {
   }
 
   return (
-    <div className="shell shell--welcome">
-      <main className="device welcome-page">
-        <section className="welcome-top">
-          <BrandLockup />
-        </section>
-
-        <svg className="welcome-curve" viewBox="0 0 430 48" preserveAspectRatio="none" aria-hidden>
-          <path d="M0 48 C120 8 310 8 430 48 L430 48 L0 48 Z" fill="#dce4d3" />
-        </svg>
-
-        <section className="welcome-bottom">
-          <button
-            type="button"
-            className="google-btn"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
-            <GoogleIcon />
-            {loading ? 'Signing in…' : 'Continue with Google'}
-          </button>
-
-          <p className="secure-badge">
-            <ShieldCheck size={16} strokeWidth={2.25} />
-            Secure &amp; Private
-          </p>
-
-          <img
-            src="/brand/food-biryani.png"
-            alt=""
-            className="welcome-food welcome-food--left"
-            draggable={false}
-          />
-          <img
-            src="/brand/food-sides.png"
-            alt=""
-            className="welcome-food welcome-food--right"
-            draggable={false}
-          />
-        </section>
-
-        {error && (
-          <div
-            className="login-popup-backdrop"
-            role="presentation"
-            onClick={() => setError(null)}
-          >
-            <div
-              className="login-popup"
-              role="alertdialog"
-              aria-modal="true"
-              aria-labelledby="login-popup-title"
-              aria-describedby="login-popup-message"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <h3 id="login-popup-title" className="login-popup-title">
-                Sign-in failed
-              </h3>
-              <p id="login-popup-message" className="login-popup-message">
-                {error}
-              </p>
-              <button
-                type="button"
-                className="login-popup-btn"
-                onClick={() => setError(null)}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+    <SplashPageView
+      loading={loading}
+      error={error}
+      onLogin={handleGoogleLogin}
+      onDismissError={() => setError(null)}
+    />
   )
+}
+
+function SplashPageWithoutGoogle() {
+  const [error, setError] = useState<string | null>(null)
+
+  const handleGoogleLogin = () => {
+    setError('Google sign-in is not configured for this deployment.')
+  }
+
+  return (
+    <SplashPageView
+      loading={false}
+      error={error}
+      onLogin={handleGoogleLogin}
+      onDismissError={() => setError(null)}
+    />
+  )
+}
+
+export function SplashPage(props: SplashPageProps) {
+  if (hasGoogleClientId) {
+    return <SplashPageWithGoogle {...props} />
+  }
+
+  return <SplashPageWithoutGoogle />
 }
