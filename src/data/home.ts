@@ -14,7 +14,17 @@ export const categories = [
   { id: 'egg', label: 'Egg', image: '/categories/egg.jpg', active: false },
 ]
 
-export const bestSellers = [
+export type MenuItem = {
+  id: string
+  name: string
+  desc: string
+  price: number
+  image: string
+  customizable: boolean
+  categoryId: string
+}
+
+export const bestSellers: MenuItem[] = [
   {
     id: 'bs-chicken-malabar',
     name: 'Chicken Dum Biryani Malabar Special',
@@ -22,6 +32,7 @@ export const bestSellers = [
     price: 219.05,
     image: '/bestsellers/chicken-malabar.jpg',
     customizable: true,
+    categoryId: 'biryanis',
   },
   {
     id: 'bs-beef-malabar',
@@ -30,6 +41,7 @@ export const bestSellers = [
     price: 219.05,
     image: '/bestsellers/beef-malabar.jpg',
     customizable: true,
+    categoryId: 'biryanis',
   },
   {
     id: 'bs-chicken-fry',
@@ -38,6 +50,7 @@ export const bestSellers = [
     price: 152.38,
     image: '/bestsellers/chicken-fry.jpg',
     customizable: true,
+    categoryId: 'fry',
   },
   {
     id: 'bs-donne-chicken',
@@ -46,48 +59,176 @@ export const bestSellers = [
     price: 219.05,
     image: '/bestsellers/donne-chicken.jpg',
     customizable: true,
+    categoryId: 'biryanis',
   },
 ]
 
-export const products = [
+export const biryanis: MenuItem[] = [
   {
-    id: '1',
-    name: 'Chicken Dum Biriyani',
-    desc: 'With saffron & spices',
-    image: '/bestsellers/chicken-malabar.jpg',
-    isNew: true,
-    discount: '50% OFF',
-    rating: 4.9,
-    price: 320,
-  },
-  {
-    id: '2',
-    name: 'Mutton Dum Biriyani',
-    desc: 'Slow-cooked Malabar style',
-    image: '/bestsellers/beef-malabar.jpg',
-    isNew: false,
-    discount: '32% OFF',
-    rating: 4.8,
-    price: 420,
-  },
-  {
-    id: '3',
-    name: 'Thalassery Chicken',
-    desc: 'Kaima rice specialty',
+    id: 'donne-chicken',
+    name: 'Donne Biryani - Chicken',
+    desc: 'Seeraga samba rice slow cooked in dum with tender chicken.',
+    price: 219.05,
     image: '/bestsellers/donne-chicken.jpg',
-    isNew: true,
-    discount: '40% OFF',
-    rating: 4.9,
-    price: 300,
+    customizable: true,
+    categoryId: 'biryanis',
   },
   {
-    id: '4',
-    name: 'Family Feast Combo',
-    desc: 'Serves 4–5 people',
-    image: '/brand/food-biryani.jpg',
-    isNew: false,
-    discount: '25% OFF',
-    rating: 5.0,
-    price: 1299,
+    id: 'mini-donne-chicken',
+    name: 'Mini Donne Biryani - Chicken',
+    desc: 'Mini pack with single piece chicken, Seeraga samba rice.',
+    price: 152.38,
+    image: '/bestsellers/donne-chicken.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'rice-donne-egg',
+    name: 'Rice Donne Biryani (Non Veg) + Egg',
+    desc: 'Seeraga samba rice slow cooked in dum with egg.',
+    price: 114.29,
+    image: '/bestsellers/donne-chicken.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'donne-rice-chicken-fry',
+    name: 'Donne Biryani Rice+Chicken Fry',
+    desc: 'Seeraga samba rice slow cooked in dum with chicken fry.',
+    price: 228.57,
+    image: '/bestsellers/donne-chicken.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'rice-only-donne',
+    name: 'Rice Only - Donne Biryani',
+    desc: 'Aromatic Seeraga samba rice only.',
+    price: 85.71,
+    image: '/bestsellers/donne-chicken.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'chicken-malabar',
+    name: 'Chicken Dum Biryani Malabar Special',
+    desc: 'Kaima rice slow cooked in dum with tender chicken.',
+    price: 219.05,
+    image: '/bestsellers/chicken-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'mini-mutton-malabar',
+    name: 'Mini Mutton Dum Biryani [Bone In]',
+    desc: 'Half portion, single pc, kaima rice with mutton.',
+    price: 228.57,
+    image: '/bestsellers/beef-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'beef-malabar',
+    name: 'Beef Dum Biryani Malabar Special',
+    desc: 'Kaima rice slow cooked in dum with succulent beef.',
+    price: 219.05,
+    image: '/bestsellers/beef-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'mutton-malabar',
+    name: 'Mutton Dum Biryani Malabar Special [Bone In]',
+    desc: 'Kaima rice slow cooked in dum with succulent mutton.',
+    price: 333.33,
+    image: '/bestsellers/beef-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'mini-chicken-malabar',
+    name: 'Mini Chicken Dum Biryani Malabar',
+    desc: 'Mini pack with single piece chicken, kaima rice.',
+    price: 152.38,
+    image: '/bestsellers/chicken-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'mini-beef-malabar',
+    name: 'Mini Beef Dum Biryani Malabar',
+    desc: 'Kaima rice slow cooked in dum with beef, mini pack.',
+    price: 161.9,
+    image: '/bestsellers/beef-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'malabar-rice-chicken-fry',
+    name: 'Dum Biryani Rice + Chicken Fry',
+    desc: 'Malabar rice with 3 pc chicken fry and egg.',
+    price: 228.57,
+    image: '/bestsellers/chicken-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
+  },
+  {
+    id: 'rice-only-malabar',
+    name: 'Rice Only - Malabar Biryani',
+    desc: 'Aromatic kaima rice only.',
+    price: 85.71,
+    image: '/bestsellers/chicken-malabar.jpg',
+    customizable: true,
+    categoryId: 'biryanis',
   },
 ]
+
+export const drinks: MenuItem[] = [
+  {
+    id: '7up-330ml',
+    name: '7 UP 330ml CAN',
+    desc: '330 ml 7 UP',
+    price: 66.67,
+    image: '/categories/drinks.jpg',
+    customizable: false,
+    categoryId: 'drinks',
+  },
+  {
+    id: 'fresh-lime',
+    name: 'Fresh Lime',
+    desc: 'Fresh Lime Juice',
+    price: 47.62,
+    image: '/categories/drinks.jpg',
+    customizable: false,
+    categoryId: 'drinks',
+  },
+  {
+    id: 'mirinda-330ml',
+    name: 'Mirinda 330ml CAN',
+    desc: '330 ml can Mirinda',
+    price: 66.67,
+    image: '/categories/drinks.jpg',
+    customizable: false,
+    categoryId: 'drinks',
+  },
+  {
+    id: 'pepsi-330ml',
+    name: 'Pepsi 330ml CAN',
+    desc: '330 ml Pepsi',
+    price: 66.67,
+    image: '/categories/drinks.jpg',
+    customizable: false,
+    categoryId: 'drinks',
+  },
+  {
+    id: 'zero-pepsi-330ml',
+    name: 'Zero Pepsi 330ml Can',
+    desc: 'Zero Sugar Pepsi 330 ml CAN',
+    price: 66.67,
+    image: '/categories/drinks.jpg',
+    customizable: false,
+    categoryId: 'drinks',
+  },
+]
+
+export const products: MenuItem[] = []

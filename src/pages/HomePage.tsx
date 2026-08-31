@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getActiveOrders, type ActiveOrder } from '../config/orders'
-import { bestSellers, categories as categoryData, products, store } from '../data/home'
+import { bestSellers, biryanis, categories as categoryData, drinks, products, store } from '../data/home'
 
 export function HomePage() {
   const [activeCategory, setActiveCategory] = useState('biryanis')
@@ -37,6 +37,17 @@ export function HomePage() {
 
   const activeLabel =
     categoryData.find((c) => c.id === activeCategory)?.label ?? 'Biryanis'
+
+  const categoryMenus: Record<string, typeof biryanis> = {
+    biryanis,
+    drinks,
+  }
+
+  const categoryItems =
+    categoryMenus[activeCategory] ?? [
+      ...bestSellers.filter((item) => item.categoryId === activeCategory),
+      ...products.filter((item) => item.categoryId === activeCategory),
+    ]
 
   return (
     <div className="shell">
@@ -118,9 +129,9 @@ export function HomePage() {
             </section>
           )}
 
-          {/* Best Sellers */}
+          {/* Trending */}
           <section className={`bestsellers-section ${orders.length > 0 ? 'mt-6' : ''}`}>
-            <h2 className="section-title">Best Sellers</h2>
+            <h2 className="section-title">Trending</h2>
             <div className="bestsellers-carousel" aria-live="polite">
               <div
                 className="bestsellers-track"
@@ -193,29 +204,30 @@ export function HomePage() {
             </div>
           </section>
 
-          {/* Products */}
-          <section className="mt-6 pb-36">
-            <h2 className="section-title">All {activeLabel}</h2>
-            <div className="product-grid">
-              {products.map((item) => (
-                <article key={item.id} className="product-card">
-                  <div className="product-image-wrap">
-                    <img src={item.image} alt={item.name} />
-                    {item.isNew && <span className="badge-new">NEW</span>}
-                    <span className="badge-off">{item.discount}</span>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-bold text-ink leading-snug">{item.name}</h3>
-                    <p className="text-[11.2px] text-muted mt-0.5">{item.desc}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm font-bold text-brand">₹{item.price}</span>
-                      <span className="text-[10px] text-muted">★ {item.rating}</span>
+          {categoryItems.length > 0 && (
+            <section className="mt-6">
+              <h2 className="section-title">All {activeLabel}</h2>
+              <div className="product-grid">
+                {categoryItems.map((item) => (
+                  <article key={item.id} className="product-card">
+                    <div className="product-image-wrap">
+                      <img src={item.image} alt={item.name} />
                     </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+                    <div className="p-3">
+                      <h3 className="text-sm font-bold text-ink leading-snug">{item.name}</h3>
+                      <p className="text-[11.2px] text-muted mt-0.5">{item.desc}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-sm font-bold text-brand">₹{item.price.toFixed(2)}</span>
+                        {item.customizable && (
+                          <span className="text-[10px] text-muted">Customizable</span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         {/* Cart bar */}
