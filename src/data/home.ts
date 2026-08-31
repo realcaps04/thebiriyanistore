@@ -8,10 +8,45 @@ export const store = {
 }
 
 export const categories = [
-  { id: 'biryanis', label: 'Biryanis', icon: '🍛', active: true },
-  { id: 'fry', label: 'Fry', icon: '🍗', active: false },
-  { id: 'drinks', label: 'Drinks (Beverages)', icon: '🥤', active: false },
-  { id: 'egg', label: 'Egg', icon: '🥚', active: false },
+  { id: 'biryanis', label: 'Biryanis', image: '/categories/biryanis.png', active: true },
+  { id: 'fry', label: 'Fry', image: '/categories/fry.jpg', active: false },
+  { id: 'drinks', label: 'Drinks (Beverages)', image: '/categories/drinks.jpg', active: false },
+  { id: 'egg', label: 'Egg', image: '/categories/egg.jpg', active: false },
+]
+
+export const bestSellers = [
+  {
+    id: 'bs-chicken-malabar',
+    name: 'Chicken Dum Biryani Malabar Special',
+    desc: 'Kaima rice dum biryani with tender chicken.',
+    price: 219.05,
+    image: '/categories/biryanis.png',
+    customizable: true,
+  },
+  {
+    id: 'bs-beef-malabar',
+    name: 'Beef Dum Biryani Malabar Special',
+    desc: 'Kaima rice dum biryani with succulent beef.',
+    price: 219.05,
+    image: '/categories/biryanis.png',
+    customizable: true,
+  },
+  {
+    id: 'bs-chicken-fry',
+    name: 'Chicken Fry Bangalore Special',
+    desc: 'Bangalore style chicken fry.',
+    price: 152.38,
+    image: '/categories/fry.jpg',
+    customizable: true,
+  },
+  {
+    id: 'bs-donne-chicken',
+    name: 'Donne Biryani - Chicken',
+    desc: 'Seeraga samba donne biryani with chicken.',
+    price: 219.05,
+    image: '/categories/biryanis.png',
+    customizable: true,
+  },
 ]
 
 export const products = [

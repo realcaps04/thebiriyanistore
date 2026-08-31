@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getActiveOrders, type ActiveOrder } from '../config/orders'
-import { categories as categoryData, products, store } from '../data/home'
+import { bestSellers, categories as categoryData, products, store } from '../data/home'
 
 export function HomePage() {
   const [activeCategory, setActiveCategory] = useState('biryanis')
@@ -23,6 +23,16 @@ export function HomePage() {
 
   useEffect(() => {
     setOrders(getActiveOrders())
+  }, [])
+
+  const [bestSellerIndex, setBestSellerIndex] = useState(0)
+
+  useEffect(() => {
+    if (bestSellers.length <= 1) return
+    const timer = window.setInterval(() => {
+      setBestSellerIndex((index) => (index + 1) % bestSellers.length)
+    }, 4500)
+    return () => window.clearInterval(timer)
   }, [])
 
   const activeLabel =
@@ -108,8 +118,37 @@ export function HomePage() {
             </section>
           )}
 
-          {/* Categories */}
+          {/* Best Sellers */}
           <section className={orders.length > 0 ? 'mt-6' : ''}>
+            <h2 className="section-title">Best Sellers</h2>
+            <div className="bestsellers-row scrollbar-hide">
+              {bestSellers.map((item) => (
+                <article key={item.id} className="bestseller-card">
+                  <div className="bestseller-card__image">
+                    <img src={item.image} alt="" />
+                  </div>
+                  <div className="bestseller-card__body">
+                    <h3 className="bestseller-card__title">{item.name}</h3>
+                    <p className="bestseller-card__desc">{item.desc}</p>
+                    <div className="bestseller-card__footer">
+                      <div>
+                        <p className="bestseller-card__price">₹{item.price.toFixed(2)}</p>
+                        {item.customizable && (
+                          <p className="bestseller-card__custom">Customization available</p>
+                        )}
+                      </div>
+                      <button type="button" className="bestseller-card__add">
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          {/* Categories */}
+          <section className="mt-6">
             <div className="section-header">
               <h2 className="section-title section-title--inline">Search By Categories</h2>
               <button type="button" className="section-view-all">
@@ -128,7 +167,7 @@ export function HomePage() {
                     className={`category-pill ${isActive ? 'category-pill--active' : ''}`}
                   >
                     <span className={`category-icon ${isActive ? 'category-icon--active' : ''}`}>
-                      {cat.icon}
+                      <img src={cat.image} alt="" className="category-icon__img" />
                     </span>
                     <span className="text-xs font-semibold">{cat.label}</span>
                   </button>
