@@ -3,7 +3,6 @@ export const store = {
   slug: 'thebiriyanistore',
   location: 'Kaloor, Kochi',
   locationDetail: 'Vylopilly Lane, Kaloor, Kochi, India 682017',
-  locationLines: ['Vylopilly Lane, Kaloor,', 'Kochi, India 682017'],
   mapEmbedUrl:
     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3929.3333486653414!2d76.29544367480665!3d9.989298590115535!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080df4339ced6f%3A0x949a79ae7ee00b7c!2sThe%20Biryani%20Store!5e0!3m2!1sen!2sin!4v1788187538853!5m2!1sen!2sin',
 }

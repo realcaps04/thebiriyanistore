@@ -34,26 +34,20 @@ export function HomePage() {
           </div>
           <div className="home-header__text">
             <h1 className="home-header__title">{store.name}</h1>
-            <div className="home-header__location-block">
-              {store.locationLines.map((line, index) => (
-                <span key={line} className="home-header__location">
-                  <span className="home-header__sep" aria-hidden>
-                    ·
-                  </span>
-                  <span className="home-header__address">{line}</span>
-                  {index === store.locationLines.length - 1 && (
-                    <button
-                      type="button"
-                      className="home-header__map-btn"
-                      aria-label="Open in Google Maps"
-                      onClick={() => setMapOpen(true)}
-                    >
-                      <img src="/brand/google-maps.svg" alt="" className="home-header__map-logo" />
-                    </button>
-                  )}
-                </span>
-              ))}
-            </div>
+            <span className="home-header__location">
+              <span className="home-header__sep" aria-hidden>
+                ·
+              </span>
+              <span className="home-header__address">{store.locationDetail}</span>
+              <button
+                type="button"
+                className="home-header__map-btn"
+                aria-label="Open in Google Maps"
+                onClick={() => setMapOpen(true)}
+              >
+                <img src="/brand/google-maps.svg" alt="" className="home-header__map-logo" />
+              </button>
+            </span>
           </div>
           <button type="button" className="icon-btn home-header__notify" aria-label="Notifications">
             <Bell size={20} />
