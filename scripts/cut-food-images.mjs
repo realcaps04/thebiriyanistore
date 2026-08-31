@@ -8,10 +8,10 @@ const refPath = path.join(brandDir, 'welcome-reference.jpg')
 
 function sampleBackgroundColor(image) {
   const samples = [
-    [2, 2],
-    [image.bitmap.width - 3, 2],
-    [2, image.bitmap.height - 3],
-    [image.bitmap.width - 3, image.bitmap.height - 3],
+    [4, 4],
+    [image.bitmap.width - 5, 4],
+    [4, image.bitmap.height - 5],
+    [image.bitmap.width - 5, image.bitmap.height - 5],
   ]
 
   let r = 0
@@ -32,14 +32,16 @@ function sampleBackgroundColor(image) {
   }
 }
 
-function isBackground(r, g, b, bg, tolerance) {
+function shouldBeTransparent(r, g, b, bg, tolerance) {
+  if (r < 50 && g < 50 && b < 50) return true
+
   const dr = r - bg.r
   const dg = g - bg.g
   const db = b - bg.b
   return Math.sqrt(dr * dr + dg * dg + db * db) <= tolerance
 }
 
-async function exportCrop(x, y, w, h, outName, tolerance = 34) {
+async function exportCrop(x, y, w, h, outName, tolerance = 28) {
   const ref = await Jimp.read(refPath)
   const crop = ref.clone().crop({ x, y, w, h })
   const bg = sampleBackgroundColor(crop)
@@ -49,7 +51,7 @@ async function exportCrop(x, y, w, h, outName, tolerance = 34) {
     const g = crop.bitmap.data[idx + 1]
     const b = crop.bitmap.data[idx + 2]
 
-    if (isBackground(r, g, b, bg, tolerance)) {
+    if (shouldBeTransparent(r, g, b, bg, tolerance)) {
       crop.bitmap.data[idx + 3] = 0
     }
   })
@@ -57,7 +59,8 @@ async function exportCrop(x, y, w, h, outName, tolerance = 34) {
   await crop.write(path.join(brandDir, outName))
 }
 
-await exportCrop(0, 905, 215, 119, 'food-biryani.png', 30)
-await exportCrop(268, 915, 205, 109, 'food-sides.png', 30)
+// Stop above the mockup home-indicator bar at the bottom of the reference.
+await exportCrop(0, 835, 278, 165, 'food-biryani.png', 26)
+await exportCrop(218, 840, 255, 160, 'food-sides.png', 26)
 
-console.log('Saved transparent food PNGs')
+console.log('Saved clean food PNGs')

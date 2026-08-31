@@ -28,7 +28,7 @@ export function HomePage() {
         <header className="home-header">
           <div className="flex items-center gap-3 min-w-0">
             <div className="store-logo">
-              <img src="/splash-screen.jpg" alt="" className="w-full h-full object-cover" />
+              <img src="/brand/logo.png" alt="" className="w-full h-full object-contain p-1" />
             </div>
             <div className="min-w-0">
               <p className="text-[11.2px] text-muted font-medium truncate">{store.slug}</p>

@@ -78,8 +78,6 @@ export function SplashPage({ onLoginSuccess }: SplashPageProps) {
             {loading ? 'Signing in…' : 'Continue with Google'}
           </button>
 
-          {error && <p className="login-error">{error}</p>}
-
           <p className="secure-badge">
             <ShieldCheck size={16} strokeWidth={2.25} />
             Secure &amp; Private
@@ -99,7 +97,36 @@ export function SplashPage({ onLoginSuccess }: SplashPageProps) {
           />
         </section>
 
-        <div className="home-indicator" aria-hidden />
+        {error && (
+          <div
+            className="login-popup-backdrop"
+            role="presentation"
+            onClick={() => setError(null)}
+          >
+            <div
+              className="login-popup"
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="login-popup-title"
+              aria-describedby="login-popup-message"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h3 id="login-popup-title" className="login-popup-title">
+                Sign-in failed
+              </h3>
+              <p id="login-popup-message" className="login-popup-message">
+                {error}
+              </p>
+              <button
+                type="button"
+                className="login-popup-btn"
+                onClick={() => setError(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
