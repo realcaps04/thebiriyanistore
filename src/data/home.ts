@@ -203,6 +203,15 @@ export const drinks: MenuItem[] = [
     categoryId: 'drinks',
   },
   {
+    id: 'mint-lime',
+    name: 'Mint Lime Juice',
+    desc: 'Refreshing mint and lime juice',
+    price: 59,
+    image: '/drinks/fresh-lime.png',
+    customizable: false,
+    categoryId: 'drinks',
+  },
+  {
     id: 'mirinda-330ml',
     name: 'Mirinda 330ml CAN',
     desc: '330 ml can Mirinda',

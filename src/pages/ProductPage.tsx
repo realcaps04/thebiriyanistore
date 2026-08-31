@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  Check,
   ChevronRight,
   Flame,
   Heart,
@@ -9,12 +10,27 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { addCartItem } from '../config/cart'
 import {
   getMenuItemById,
+  getProductAddonGroups,
+  getProductDetails,
   getProductSizes,
   isBestSeller,
-  productAddons,
+  type ProductAddonGroup,
 } from '../data/menu'
+
+function toggleGroupSelection(
+  group: ProductAddonGroup,
+  selected: string[],
+  addonId: string,
+): string[] {
+  if (selected.includes(addonId)) {
+    return selected.filter((id) => id !== addonId)
+  }
+  if (selected.length >= group.max) return selected
+  return [...selected, addonId]
+}
 
 export function ProductPage() {
   const { id } = useParams<{ id: string }>()
@@ -22,24 +38,62 @@ export function ProductPage() {
   const item = id ? getMenuItemById(id) : undefined
 
   const sizes = useMemo(() => (item ? getProductSizes(item) : []), [item])
-  const [sizeId, setSizeId] = useState(sizes[0]?.id ?? 'standard')
-  const [addons, setAddons] = useState<string[]>([])
+  const addonGroups = useMemo(() => (item ? getProductAddonGroups(item) : []), [item])
+  const details = item ? getProductDetails(item) : ''
+
+  const [sizeId, setSizeId] = useState(() => sizes[0]?.id ?? 'standard')
+  const [groupSelections, setGroupSelections] = useState<Record<string, string[]>>({})
+  const [specialInstructions, setSpecialInstructions] = useState('')
 
   if (!item) {
     return <Navigate to="/home" replace />
   }
 
   const selectedSize = sizes.find((size) => size.id === sizeId) ?? sizes[0]
-  const addonTotal = productAddons
-    .filter((addon) => addons.includes(addon.id))
-    .reduce((sum, addon) => sum + addon.price, 0)
-  const total = (selectedSize?.price ?? item.price) + addonTotal
 
-  const toggleAddon = (addonId: string) => {
-    setAddons((current) =>
-      current.includes(addonId) ? current.filter((id) => id !== addonId) : [...current, addonId],
-    )
+  const selectedAddons = addonGroups.flatMap((group) => {
+    const ids = groupSelections[group.id] ?? []
+    return group.items
+      .filter((addon) => ids.includes(addon.id))
+      .map((addon) => ({
+        id: addon.id,
+        groupId: group.id,
+        name: addon.name,
+        price: addon.price,
+      }))
+  })
+
+  const addonTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0)
+  const total = (selectedSize?.price ?? item.price) + addonTotal
+  const addonCount = selectedAddons.length
+
+  const handleGroupToggle = (group: ProductAddonGroup, addonId: string) => {
+    setGroupSelections((current) => ({
+      ...current,
+      [group.id]: toggleGroupSelection(group, current[group.id] ?? [], addonId),
+    }))
   }
+
+  const handleAddToCart = () => {
+    addCartItem({
+      menuItemId: item.id,
+      name: item.name,
+      image: item.image,
+      sizeId: selectedSize?.id ?? 'standard',
+      sizeLabel: selectedSize?.label ?? 'Standard',
+      basePrice: selectedSize?.price ?? item.price,
+      addons: selectedAddons,
+      specialInstructions: specialInstructions.trim(),
+      quantity: 1,
+    })
+    navigate('/home')
+  }
+
+  const summaryParts = [
+    item.name,
+    sizes.length > 1 ? selectedSize?.label : null,
+    addonCount > 0 ? `+${addonCount} add-on${addonCount > 1 ? 's' : ''}` : null,
+  ].filter(Boolean)
 
   return (
     <div className="shell">
@@ -79,6 +133,9 @@ export function ProductPage() {
                   <Star size={14} className="product-hero__star" aria-hidden />
                   4.9 (2.4k)
                 </span>
+                <span className="product-hero__meta-item">
+                  ₹{(selectedSize?.price ?? item.price).toFixed(2)}
+                </span>
                 {item.customizable && (
                   <span className="product-hero__meta-item">
                     <Flame size={14} aria-hidden />
@@ -105,7 +162,9 @@ export function ProductPage() {
                       className={`product-size-card ${active ? 'product-size-card--active' : ''}`}
                       onClick={() => setSizeId(size.id)}
                     >
-                      <span className={`product-size-card__radio ${active ? 'product-size-card__radio--active' : ''}`} />
+                      <span
+                        className={`product-size-card__radio ${active ? 'product-size-card__radio--active' : ''}`}
+                      />
                       <span className="product-size-card__label">{size.label}</span>
                       <span className="product-size-card__detail">{size.detail}</span>
                       <span className="product-size-card__price">₹{size.price.toFixed(2)}</span>
@@ -116,50 +175,71 @@ export function ProductPage() {
             </section>
           )}
 
-          {item.customizable && (
-            <section className="product-section">
-              <h2 className="product-section__title">Add Ingredients</h2>
-              <div className="product-addon-grid">
-                {productAddons.map((addon) => {
-                  const active = addons.includes(addon.id)
-                  return (
-                    <button
-                      key={addon.id}
-                      type="button"
-                      className={`product-addon-card ${active ? 'product-addon-card--active' : ''}`}
-                      onClick={() => toggleAddon(addon.id)}
-                    >
-                      <span className="product-addon-card__icon">{addon.icon}</span>
-                      <span className="product-addon-card__name">{addon.name}</span>
-                      <span className="product-addon-card__price">+₹{addon.price.toFixed(2)}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </section>
-          )}
+          {addonGroups.map((group) => {
+            const selected = groupSelections[group.id] ?? []
+            return (
+              <section key={group.id} className="product-section">
+                <div className="product-addon-group__head">
+                  <h2 className="product-section__title product-section__title--inline">
+                    {group.title}
+                  </h2>
+                  <span className="product-addon-group__count">
+                    {selected.length}/{group.max}
+                  </span>
+                </div>
+                <div className="product-addon-list">
+                  {group.items.map((addon) => {
+                    const active = selected.includes(addon.id)
+                    const disabled = !active && selected.length >= group.max
+                    return (
+                      <button
+                        key={addon.id}
+                        type="button"
+                        className={`product-addon-row ${active ? 'product-addon-row--active' : ''} ${disabled ? 'product-addon-row--disabled' : ''}`}
+                        onClick={() => handleGroupToggle(group, addon.id)}
+                        disabled={disabled}
+                      >
+                        <span
+                          className={`product-addon-row__check ${active ? 'product-addon-row__check--active' : ''}`}
+                          aria-hidden
+                        >
+                          {active && <Check size={12} strokeWidth={3} />}
+                        </span>
+                        <span className="product-addon-row__name">{addon.name}</span>
+                        <span className="product-addon-row__price">₹{addon.price.toFixed(2)}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
+            )
+          })}
+
+          <section className="product-section">
+            <h2 className="product-section__title">Special Instructions</h2>
+            <textarea
+              className="product-instructions"
+              placeholder="e.g. less spicy, no onion, extra gravy on side..."
+              value={specialInstructions}
+              onChange={(event) => setSpecialInstructions(event.target.value)}
+              rows={3}
+              maxLength={200}
+            />
+            <p className="product-instructions__hint">{specialInstructions.length}/200</p>
+          </section>
 
           <section className="product-section product-section--last">
             <h2 className="product-section__title">Description</h2>
-            <p className="product-description">{item.desc}</p>
-            {item.customizable && (
-              <p className="product-description">
-                Slow-cooked with aromatic spices and premium rice. Customize with add-ons before adding
-                to your cart.
-              </p>
-            )}
+            <p className="product-description">{details}</p>
           </section>
         </div>
 
         <div className="product-cart-bar">
           <div className="product-cart-bar__text">
             <p className="product-cart-bar__count">01 Item selected</p>
-            <p className="product-cart-bar__summary">
-              {item.name}
-              {addons.length > 0 ? `, +${addons.length} add-on${addons.length > 1 ? 's' : ''}` : ''}
-            </p>
+            <p className="product-cart-bar__summary">{summaryParts.join(', ')}</p>
           </div>
-          <button type="button" className="product-cart-bar__cta">
+          <button type="button" className="product-cart-bar__cta" onClick={handleAddToCart}>
             <span>₹{total.toFixed(2)}</span>
             <ChevronRight size={18} aria-hidden />
           </button>

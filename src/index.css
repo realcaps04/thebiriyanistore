@@ -513,15 +513,18 @@ body {
 
 .bestsellers-track {
   display: flex;
+  width: 100%;
   transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bestseller-card {
   flex: 0 0 100%;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border-radius: 1.25rem;
   background: rgba(255, 255, 255, 0.52);
   backdrop-filter: blur(18px) saturate(160%);
@@ -1600,8 +1603,7 @@ body {
   cursor: pointer;
 }
 
-.product-card--link,
-.bestseller-card--link {
+.product-card--link {
   cursor: pointer;
   text-align: inherit;
   font: inherit;
@@ -1610,6 +1612,14 @@ body {
   border: none;
   padding: 0;
   background: transparent;
+}
+
+.bestseller-card--link {
+  cursor: pointer;
+  text-align: inherit;
+  font: inherit;
+  color: inherit;
+  border: none;
 }
 
 .bestseller-card__view {
