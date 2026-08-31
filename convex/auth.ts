@@ -3,6 +3,7 @@ import { v } from 'convex/values'
 import { internal } from './_generated/api'
 
 const SESSION_DAYS = 30
+const MAX_DEVICES_PER_ACCOUNT = 4
 
 type SignInResult = {
   token: string
@@ -73,12 +74,28 @@ export const upsertFromGoogle = internalMutation({
       })
     }
 
-    const oldSessions = await ctx.db
+    const sessions = await ctx.db
       .query('sessions')
       .withIndex('by_google_id', (q) => q.eq('googleId', args.googleId))
       .collect()
-    for (const session of oldSessions) {
-      await ctx.db.delete(session._id)
+
+    const activeSessions = []
+    for (const session of sessions) {
+      if (session.expiresAt < now) {
+        await ctx.db.delete(session._id)
+      } else {
+        activeSessions.push(session)
+      }
+    }
+
+    if (activeSessions.length >= MAX_DEVICES_PER_ACCOUNT) {
+      const sessionsToRemove = activeSessions
+        .sort((a, b) => a.lastSeenAt - b.lastSeenAt)
+        .slice(0, activeSessions.length - MAX_DEVICES_PER_ACCOUNT + 1)
+
+      for (const session of sessionsToRemove) {
+        await ctx.db.delete(session._id)
+      }
     }
 
     const token = makeSessionToken()
@@ -172,6 +189,23 @@ export const getSession = query({
       expiresAt: session.expiresAt,
       user: mapUser(user),
     }
+  },
+})
+
+export const touchSession = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query('sessions')
+      .withIndex('by_token', (q) => q.eq('token', args.token))
+      .unique()
+
+    if (!session || session.expiresAt < Date.now()) {
+      return { ok: false as const }
+    }
+
+    await ctx.db.patch(session._id, { lastSeenAt: Date.now() })
+    return { ok: true as const }
   },
 })
 

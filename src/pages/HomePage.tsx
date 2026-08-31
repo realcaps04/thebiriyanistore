@@ -1,17 +1,13 @@
 import {
   Bell,
   ChevronRight,
-  Home,
-  ClipboardList,
-  ScanLine,
   Search,
   ShoppingCart,
-  Store,
-  User,
   X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BottomNav } from '../components/BottomNav'
 import { useCartSync, useOrdersSync } from '../hooks/useCartSync'
 import { bestSellers, biryanis, categories as categoryData, drinks, egg, products, store } from '../data/home'
 
@@ -20,7 +16,6 @@ export function HomePage() {
   const openProduct = (id: string) => navigate(`/product/${id}`)
   const [activeCategory, setActiveCategory] = useState('biryanis')
   const [mapOpen, setMapOpen] = useState(false)
-  const [comboComingSoonOpen, setComboComingSoonOpen] = useState(false)
   const { count: cartCount, total: cartTotal } = useCartSync()
   const orders = useOrdersSync() ?? []
 
@@ -268,63 +263,7 @@ export function HomePage() {
           </button>
         )}
 
-        {/* Bottom nav — floating pill */}
-        <nav className="bottom-nav" aria-label="Main navigation">
-          <button type="button" className="nav-item nav-item--active" aria-current="page">
-            <Home size={20} strokeWidth={2.25} />
-            <span>Home</span>
-          </button>
-          <button
-            type="button"
-            className="nav-item"
-            onClick={() => setComboComingSoonOpen(true)}
-          >
-            <Store size={20} strokeWidth={2} />
-            <span>Combo</span>
-          </button>
-          <button type="button" className="nav-scan" aria-label="Quick order">
-            <ScanLine size={22} strokeWidth={2.25} />
-          </button>
-          <button type="button" className="nav-item">
-            <ClipboardList size={20} strokeWidth={2} />
-            <span>Orders</span>
-          </button>
-          <button type="button" className="nav-item">
-            <User size={20} strokeWidth={2} />
-            <span>Profile</span>
-          </button>
-        </nav>
-
-        {comboComingSoonOpen && (
-          <div
-            className="login-popup-backdrop"
-            role="presentation"
-            onClick={() => setComboComingSoonOpen(false)}
-          >
-            <div
-              className="login-popup"
-              role="alertdialog"
-              aria-modal="true"
-              aria-labelledby="combo-popup-title"
-              aria-describedby="combo-popup-message"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <h3 id="combo-popup-title" className="login-popup-title">
-                Coming soon
-              </h3>
-              <p id="combo-popup-message" className="login-popup-message">
-                Combo meals are on the way. Check back soon for bundled deals and special offers.
-              </p>
-              <button
-                type="button"
-                className="login-popup-btn"
-                onClick={() => setComboComingSoonOpen(false)}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        )}
+        <BottomNav active="home" />
 
         {mapOpen && (
           <div

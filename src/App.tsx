@@ -7,6 +7,7 @@ import { useAuthSession } from './hooks/useAuthSession'
 import { CartPage } from './pages/CartPage'
 import { HomePage } from './pages/HomePage'
 import { ProductPage } from './pages/ProductPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { SplashPage } from './pages/SplashPage'
 
 function AuthLoading() {
@@ -119,11 +120,26 @@ function CartRoute() {
   return <CartPage />
 }
 
+function ProfileRoute() {
+  const { isAuthenticated, isLoading } = useAuthSession()
+
+  if (isLoading) {
+    return <AuthLoading />
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />
+  }
+
+  return <ProfilePage />
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<WelcomeRoute />} />
       <Route path="/home" element={<HomeRoute />} />
+      <Route path="/profile" element={<ProfileRoute />} />
       <Route path="/cart" element={<CartRoute />} />
       <Route path="/product/:id" element={<ProductRoute />} />
       <Route path="*" element={<Navigate to="/" replace />} />
