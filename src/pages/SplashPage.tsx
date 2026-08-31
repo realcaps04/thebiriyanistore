@@ -60,19 +60,6 @@ function SplashPageView({ loading, error, onLogin, onDismissError }: SplashPageV
             <ShieldCheck size={16} strokeWidth={2.25} />
             Secure &amp; Private
           </p>
-
-          <img
-            src="/brand/food-biryani.png"
-            alt=""
-            className="welcome-food welcome-food--left"
-            draggable={false}
-          />
-          <img
-            src="/brand/food-sides.png"
-            alt=""
-            className="welcome-food welcome-food--right"
-            draggable={false}
-          />
         </section>
 
         {error && (
