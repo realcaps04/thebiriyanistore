@@ -293,7 +293,7 @@ export function ProductPage() {
             <p className="product-cart-bar__summary">{summaryParts.join(', ')}</p>
           </div>
           <span className="product-cart-bar__cta">
-            <span>₹{total.toFixed(2)}</span>
+            <span>₹{Math.round(total)}</span>
             <ChevronRight size={18} aria-hidden />
           </span>
         </button>

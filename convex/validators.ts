@@ -25,3 +25,11 @@ export const orderTypeValidator = v.union(
   v.literal('takeaway'),
   v.literal('delivery'),
 )
+
+export const deliveryAddressFieldsValidator = v.object({
+  label: v.string(),
+  contactName: v.string(),
+  phone: v.string(),
+  addressLine: v.string(),
+  pincode: v.optional(v.string()),
+})

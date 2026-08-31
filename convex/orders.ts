@@ -44,6 +44,7 @@ export const placeOrder = mutation({
     tableNumber: v.string(),
     guestCount: v.number(),
     customerName: v.string(),
+    deliveryAddressId: v.optional(v.id('deliveryAddresses')),
   },
   handler: async (ctx, args) => {
     const googleId = await googleIdFromToken(ctx, args.token)
@@ -57,10 +58,46 @@ export const placeOrder = mutation({
       throw new Error('Cart is empty.')
     }
 
+    let deliveryAddress:
+      | {
+          label: string
+          contactName: string
+          phone: string
+          addressLine: string
+          pincode?: string
+        }
+      | undefined
+
+    if (args.orderType === 'delivery') {
+      if (!args.deliveryAddressId) {
+        throw new Error('Add a delivery address to continue.')
+      }
+
+      const address = await ctx.db.get(args.deliveryAddressId)
+      if (!address || address.googleId !== googleId) {
+        throw new Error('Delivery address not found.')
+      }
+
+      deliveryAddress = {
+        label: address.label,
+        contactName: address.contactName,
+        phone: address.phone,
+        addressLine: address.addressLine,
+        pincode: address.pincode,
+      }
+    }
+
     const subtotal = items.reduce((sum, item) => sum + lineItemTotal(item), 0)
-    const tax = subtotal * 0.025
-    const total = subtotal + tax
+    const tax = 0
+    const total = Math.round(subtotal)
     const now = Date.now()
+
+    const tableLabel =
+      args.orderType === 'dine-in'
+        ? `Table ${args.tableNumber}`
+        : args.orderType === 'delivery' && deliveryAddress
+          ? `Delivery · ${deliveryAddress.label}`
+          : args.orderType
 
     const orderId = await ctx.db.insert('orders', {
       googleId,
@@ -77,8 +114,12 @@ export const placeOrder = mutation({
       statusLabel: 'Confirmed',
       statusColor: 'bg-emerald-100 text-emerald-700',
       timeLabel: 'Just now',
-      tableLabel:
-        args.orderType === 'dine-in' ? `Table ${args.tableNumber}` : args.orderType,
+      tableLabel,
+      deliveryAddressLabel: deliveryAddress?.label,
+      deliveryContactName: deliveryAddress?.contactName,
+      deliveryPhone: deliveryAddress?.phone,
+      deliveryAddressLine: deliveryAddress?.addressLine,
+      deliveryPincode: deliveryAddress?.pincode,
       createdAt: now,
       updatedAt: now,
     })

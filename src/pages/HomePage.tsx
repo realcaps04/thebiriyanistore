@@ -130,7 +130,7 @@ export function HomePage() {
                     </div>
                     <div className="flex items-end justify-between mt-3">
                       <div>
-                        <p className="text-sm font-bold text-ink">₹{order.price}</p>
+                        <p className="text-sm font-bold text-ink">₹{Math.round(order.price)}</p>
                         <p className="text-[10px] text-muted">{order.time}</p>
                       </div>
                       <p className="text-[10px] font-medium text-brand bg-brand/10 px-2 py-1 rounded-lg">
@@ -262,7 +262,7 @@ export function HomePage() {
               {String(cartCount).padStart(2, '0')} Items selected
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold">₹{cartTotal.toFixed(2)}</span>
+              <span className="text-sm font-bold">₹{Math.round(cartTotal)}</span>
               <ChevronRight size={18} />
             </div>
           </button>

@@ -3,7 +3,12 @@ import {
   ChevronRight,
   Download,
   HandCoins,
+  MapPin,
+  Clock,
+  Phone,
+  Plus,
   ShoppingBag,
+  Trash2,
   Truck,
   Utensils,
   Users,
@@ -12,22 +17,33 @@ import { useMutation } from 'convex/react'
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
+import {
+  DeliveryAddressSheet,
+  formatAddressLine,
+  isAddressFormValid,
+  useDeliveryAddresses,
+} from '../components/DeliveryAddressSheet'
 import { getMenuItemById } from '../data/menu'
+import { orderTotals } from '../config/cart'
+import { store } from '../data/home'
 import { useAuthSession } from '../hooks/useAuthSession'
 import { useCartSync } from '../hooks/useCartSync'
 
 type OrderType = 'dine-in' | 'takeaway' | 'delivery'
 
-function formatPrice(amount: number) {
-  const [whole, fraction = '00'] = amount.toFixed(2).split('.')
-  return { whole, fraction }
-}
-
-function Price({ amount, className = '' }: { amount: number; className?: string }) {
-  const { whole, fraction } = formatPrice(amount)
+function Price({
+  amount,
+  className = '',
+  integer = false,
+}: {
+  amount: number
+  className?: string
+  integer?: boolean
+}) {
   return (
     <span className={`cart-price ${className}`.trim()}>
-      ₹{whole}.<sup>{fraction}</sup>
+      ₹{integer ? Math.round(amount).toString() : amount.toFixed(2)}
     </span>
   )
 }
@@ -36,27 +52,96 @@ function createOrderId() {
   return `#${Math.floor(10000 + Math.random() * 89999)}`
 }
 
+function getOrderInfo(orderType: OrderType) {
+  switch (orderType) {
+    case 'takeaway':
+      return {
+        title: 'Takeaway',
+        subtitle: `Pickup · ${store.location}`,
+        SubtitleIcon: Clock,
+        actionLabel: 'Change pickup',
+      }
+    case 'delivery':
+      return {
+        title: 'Home Delivery',
+        subtitle: 'Add a delivery address',
+        SubtitleIcon: MapPin,
+        actionLabel: 'Add address',
+      }
+    default:
+      return {
+        title: 'Table 12',
+        subtitle: '04 persons',
+        SubtitleIcon: Users,
+        actionLabel: 'Change table',
+      }
+  }
+}
+
 export function CartPage() {
   const navigate = useNavigate()
   const { user, token } = useAuthSession()
-  const { items, count, lineItemTotal, clearCart, isLoading } = useCartSync()
+  const { items, count, lineItemTotal, removeItem, clearCart, isLoading } = useCartSync()
   const placeOrder = useMutation(api.orders.placeOrder)
   const [orderType, setOrderType] = useState<OrderType>('dine-in')
   const [orderId] = useState(createOrderId)
   const [submitting, setSubmitting] = useState(false)
+  const [addressSheetOpen, setAddressSheetOpen] = useState(false)
+  const [addressSheetMode, setAddressSheetMode] = useState<'pick' | 'add'>('pick')
+  const [savingAddress, setSavingAddress] = useState(false)
+  const [addressLabelError, setAddressLabelError] = useState<string | null>(null)
+
+  const customerName = user?.name ?? 'Guest'
+  const {
+    addresses,
+    selectedAddress,
+    selectedId,
+    selectAddress,
+    saveAddress,
+    emptyForm,
+  } = useDeliveryAddresses(token, customerName)
+  const [addressForm, setAddressForm] = useState(() => emptyForm())
 
   if (!isLoading && items.length === 0) {
     return <Navigate to="/home" replace />
   }
 
-  const subtotal = items.reduce((sum, item) => sum + lineItemTotal(item), 0)
-  const taxRate = 0.025
-  const tax = subtotal * taxRate
-  const grandTotal = subtotal + tax
-  const customerName = user?.name ?? 'Guest'
+  const { subtotal, total: grandTotal } = orderTotals(
+    items.reduce((sum, item) => sum + lineItemTotal(item), 0),
+  )
+  const orderInfo = getOrderInfo(orderType)
+  const SubtitleIcon = orderInfo.SubtitleIcon
+  const deliveryNeedsAddress = orderType === 'delivery' && !selectedAddress
+
+  const openAddressSheet = (mode: 'pick' | 'add' = 'pick') => {
+    setAddressLabelError(null)
+    if (mode === 'add') {
+      setAddressForm(emptyForm())
+    }
+    setAddressSheetMode(mode)
+    setAddressSheetOpen(true)
+  }
+
+  const handleSaveAddress = async () => {
+    if (!isAddressFormValid(addressForm) || savingAddress) return
+
+    setSavingAddress(true)
+    setAddressLabelError(null)
+    try {
+      await saveAddress(addressForm)
+      setAddressSheetOpen(false)
+      setAddressSheetMode('pick')
+    } catch (error) {
+      setAddressLabelError(
+        error instanceof Error ? error.message : 'Could not save this address.',
+      )
+    } finally {
+      setSavingAddress(false)
+    }
+  }
 
   const handleCheckout = async () => {
-    if (!token || submitting) return
+    if (!token || submitting || deliveryNeedsAddress) return
 
     setSubmitting(true)
     try {
@@ -67,6 +152,10 @@ export function CartPage() {
         tableNumber: '12',
         guestCount: 4,
         customerName,
+        deliveryAddressId:
+          orderType === 'delivery' && selectedId
+            ? (selectedId as Id<'deliveryAddresses'>)
+            : undefined,
       })
       await clearCart()
       navigate('/home')
@@ -121,17 +210,67 @@ export function CartPage() {
 
           <section className="cart-card cart-card--info">
             <div className="cart-info__top">
-              <div>
-                <p className="cart-info__table">Table 12</p>
-                <p className="cart-info__persons">
-                  <Users size={13} aria-hidden />
-                  04 persons
-                </p>
+              <div className="cart-info__primary">
+                {orderType === 'delivery' ? (
+                  selectedAddress ? (
+                    <>
+                      <p className="cart-info__table">{selectedAddress.label}</p>
+                      <p className="cart-info__persons">
+                        <MapPin size={13} aria-hidden />
+                        <span className="cart-info__persons-text--address">
+                          {formatAddressLine(selectedAddress)}
+                        </span>
+                      </p>
+                      <p className="cart-info__phone">
+                        <Phone size={13} aria-hidden />
+                        {selectedAddress.phone}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="cart-info__table">Home Delivery</p>
+                      <p className="cart-info__persons">
+                        <MapPin size={13} aria-hidden />
+                        <span>Add your delivery address and contact number</span>
+                      </p>
+                    </>
+                  )
+                ) : (
+                  <>
+                    <p className="cart-info__table">{orderInfo.title}</p>
+                    <p className="cart-info__persons">
+                      <SubtitleIcon size={13} aria-hidden />
+                      <span>{orderInfo.subtitle}</span>
+                    </p>
+                  </>
+                )}
               </div>
-              <button type="button" className="cart-link-btn">
-                Change table
-                <ChevronRight size={14} aria-hidden />
-              </button>
+              {orderType === 'delivery' ? (
+                selectedAddress ? (
+                  <button
+                    type="button"
+                    className="cart-link-btn"
+                    onClick={() => openAddressSheet('pick')}
+                  >
+                    Change address
+                    <ChevronRight size={14} aria-hidden />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="cart-link-btn cart-link-btn--primary"
+                    onClick={() => openAddressSheet('add')}
+                  >
+                    <Plus size={14} aria-hidden />
+                    Add address
+                  </button>
+                )
+              ) : (
+                <button type="button" className="cart-link-btn">
+                  {orderInfo.actionLabel}
+                  <ChevronRight size={14} aria-hidden />
+                </button>
+              )}
             </div>
             <div className="cart-info__divider" aria-hidden />
             <div className="cart-info__bottom">
@@ -157,10 +296,9 @@ export function CartPage() {
             <div className="cart-menu-list">
               {items.map((line) => {
                 const menuItem = getMenuItemById(line.menuItemId)
-                const desc =
-                  line.addons.length > 0
-                    ? line.addons.map((addon) => addon.name).join(', ')
-                    : menuItem?.desc ?? line.specialInstructions
+                const specialNote = line.specialInstructions.trim()
+                const showMenuDesc = line.addons.length === 0 && menuItem?.desc
+
                 return (
                   <article key={line.id} className="cart-menu-item">
                     <div className="cart-menu-item__thumb-wrap">
@@ -169,9 +307,31 @@ export function CartPage() {
                     </div>
                     <div className="cart-menu-item__body">
                       <h3 className="cart-menu-item__name">{line.name}</h3>
-                      {desc && <p className="cart-menu-item__desc">{desc}</p>}
+                      {showMenuDesc && (
+                        <p className="cart-menu-item__desc">{menuItem.desc}</p>
+                      )}
+                      {line.addons.length > 0 && (
+                        <ul className="cart-menu-item__addons">
+                          {line.addons.map((addon) => (
+                            <li key={addon.id}>{addon.name}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {specialNote && (
+                        <p className="cart-menu-item__note">Note: {specialNote}</p>
+                      )}
                     </div>
-                    <Price amount={lineItemTotal(line)} className="cart-menu-item__price" />
+                    <div className="cart-menu-item__actions">
+                      <Price amount={lineItemTotal(line)} className="cart-menu-item__price" />
+                      <button
+                        type="button"
+                        className="cart-menu-item__remove"
+                        aria-label={`Remove ${line.name}`}
+                        onClick={() => void removeItem(line.id)}
+                      >
+                        <Trash2 size={15} aria-hidden />
+                      </button>
+                    </div>
                   </article>
                 )
               })}
@@ -184,13 +344,9 @@ export function CartPage() {
               <span>Total Item ({String(count).padStart(2, '0')})</span>
               <Price amount={subtotal} />
             </div>
-            <div className="cart-summary-row">
-              <span>Tax (2.5%)</span>
-              <Price amount={tax} />
-            </div>
             <div className="cart-summary-row cart-summary-row--total">
               <span>Total amount</span>
-              <Price amount={grandTotal} className="cart-price--lg" />
+              <Price amount={grandTotal} className="cart-price--lg" integer />
             </div>
           </section>
         </div>
@@ -199,11 +355,39 @@ export function CartPage() {
           type="button"
           className="cart-checkout-btn"
           onClick={handleCheckout}
-          disabled={submitting || !token}
+          disabled={submitting || !token || deliveryNeedsAddress}
         >
           <HandCoins size={18} aria-hidden />
-          <span>{submitting ? 'Processing…' : 'Process Payout'}</span>
+          <span>
+            {submitting
+              ? 'Processing…'
+              : deliveryNeedsAddress
+                ? 'Add delivery address'
+                : 'Process Payout'}
+          </span>
         </button>
+
+        <DeliveryAddressSheet
+          open={addressSheetOpen}
+          mode={addressSheetMode}
+          addresses={addresses}
+          selectedId={selectedId}
+          form={addressForm}
+          saving={savingAddress}
+          labelError={addressLabelError}
+          onClose={() => setAddressSheetOpen(false)}
+          onSwitchToAdd={() => {
+            setAddressLabelError(null)
+            setAddressForm(emptyForm())
+            setAddressSheetMode('add')
+          }}
+          onSelect={selectAddress}
+          onFormChange={(form) => {
+            setAddressLabelError(null)
+            setAddressForm(form)
+          }}
+          onSave={() => void handleSaveAddress()}
+        />
       </main>
     </div>
   )

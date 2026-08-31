@@ -48,9 +48,28 @@ export default defineSchema({
     statusColor: v.string(),
     timeLabel: v.string(),
     tableLabel: v.string(),
+    deliveryAddressLabel: v.optional(v.string()),
+    deliveryContactName: v.optional(v.string()),
+    deliveryPhone: v.optional(v.string()),
+    deliveryAddressLine: v.optional(v.string()),
+    deliveryPincode: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index('by_google_id', ['googleId'])
     .index('by_display_order_id', ['displayOrderId']),
+
+  deliveryAddresses: defineTable({
+    googleId: v.string(),
+    label: v.string(),
+    labelKey: v.optional(v.string()),
+    contactName: v.string(),
+    phone: v.string(),
+    addressLine: v.string(),
+    pincode: v.optional(v.string()),
+    isDefault: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index('by_google_id', ['googleId'])
+    .index('by_google_id_and_label_key', ['googleId', 'labelKey']),
 })

@@ -41,6 +41,11 @@ export function lineItemTotal(item: CartLineItem): number {
   return (item.basePrice + addonTotal) * item.quantity
 }
 
+export function orderTotals(subtotal: number) {
+  const total = Math.round(subtotal)
+  return { subtotal, total }
+}
+
 export function getCartSummary() {
   const items = getCartItems()
   return {
